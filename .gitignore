@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+db/listings.db
+db/*.db-wal
+db/*.db-shm
+logs/
+dashboard/out/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.local

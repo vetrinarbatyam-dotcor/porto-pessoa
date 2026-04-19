@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מחשבון השקעת נדל"ן – פורטוגל 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0b0d12;--surface:#131620;--surface2:#1a1e2b;--border:#252b3b;--border2:#303848;
+  --gold:#c9a84c;--blue:#4a8fd4;--green:#3ec87a;--red:#e05555;--orange:#e07a2a;
+  --purple:#9b6fe0;--text:#e4e0d8;--muted:#636b7f;
+  --mono:'IBM Plex Mono',monospace;--sans:'Heebo',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding:0 0 80px}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,#0d1018 0%,#141930 100%);border-bottom:1px solid var(--border);padding:24px 32px 0}
+.header-top{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.logo{font-size:1.4rem;font-weight:900;letter-spacing:-.03em}
+.logo span{color:var(--gold)}
+.ver-badge{background:var(--gold);color:#000;font-family:var(--mono);font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:4px}
+.update-badge{background:rgba(62,200,122,.15);color:var(--green);border:1px solid rgba(62,200,122,.3);font-family:var(--mono);font-size:.62rem;padding:3px 8px;border-radius:4px;cursor:pointer;transition:.15s}
+.update-badge:hover{background:rgba(62,200,122,.25)}
+.header-right{margin-right:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.rate-pill{background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-family:var(--mono);font-size:.78rem;display:flex;align-items:center;gap:6px}
+.rate-pill span{color:var(--muted)}
+.rate-pill input{background:none;border:none;color:var(--gold);font-family:var(--mono);font-size:.78rem;width:50px;outline:none;text-align:center}
+.tax-guide-btn{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);color:var(--gold);font-family:var(--sans);font-size:.82rem;font-weight:600;padding:7px 16px;border-radius:8px;cursor:pointer;transition:.15s;white-space:nowrap}
+.tax-guide-btn:hover{background:rgba(201,168,76,.22)}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);overflow-x:auto}
+.tab{padding:12px 22px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.18s;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* LAYOUT */
+.page{display:none}
+.page.active{display:block}
+.main{display:grid;grid-template-columns:340px 1fr;gap:0;max-width:1400px;margin:0 auto}
+@media(max-width:900px){.main{grid-template-columns:1fr}}
+
+/* SIDEBAR */
+.sidebar{border-left:1px solid var(--border);padding:20px;background:var(--surface);min-height:calc(100vh - 130px)}
+.sidebar-title{font-family:var(--mono);font-size:.7rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:14px}
+label{display:flex;align-items:center;gap:5px;font-size:.8rem;color:var(--muted);margin-bottom:5px;font-weight:500}
+.info-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.85rem;padding:0;line-height:1;transition:.15s;flex-shrink:0}
+.info-btn:hover{color:var(--gold)}
+input[type="number"]{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--mono);font-size:.9rem;padding:8px 12px;transition:border-color .2s;outline:none}
+input[type="number"]:focus{border-color:var(--gold)}
+select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--sans);font-size:.85rem;padding:8px 12px;outline:none;cursor:pointer}
+.input-with-unit{position:relative}
+.input-with-unit input{padding-left:32px}
+.input-unit{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:.78rem;color:var(--muted);pointer-events:none}
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.trio .sub-label{font-size:.7rem;color:var(--muted);text-align:center;margin-top:3px}
+.section-sep{border:none;border-top:1px solid var(--border);margin:18px 0 14px}
+.section-label{font-size:.7rem;font-family:var(--mono);color:var(--gold);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;margin:6px 0 2px;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:var(--gold);border-radius:50%;cursor:pointer}
+.range-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.new-tag{background:rgba(62,200,122,.12);color:var(--green);border:1px solid rgba(62,200,122,.25);font-size:.6rem;padding:2px 5px;border-radius:3px;font-family:var(--mono)}
+.warn-inline{background:rgba(224,85,85,.08);border:1px solid rgba(224,85,85,.2);border-radius:5px;padding:6px 9px;font-size:.75rem;color:#d08080;margin-top:5px;line-height:1.5}
+.good-inline{background:rgba(62,200,122,.06);border:1px solid rgba(62,200,122,.2);border-radius:5px;padding:6px 9px;font-size:.75rem;color:#5ec47a;margin-top:5px;line-height:1.5}
+input[type="checkbox"]{accent-color:var(--gold);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.check-row{display:flex;align-items:center;gap:8px;font-size:.83rem;cursor:pointer}
+
+/* RESULTS */
+.results-area{padding:20px;overflow:auto}
+.kpi-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;transition:border-color .2s}
+.kpi-card:hover{border-color:var(--border2)}
+.kpi-label{font-size:.7rem;font-family:var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.kpi-val{font-size:1.6rem;font-weight:700;font-family:var(--mono);line-height:1}
+.kpi-sub{font-size:.72rem;color:var(--muted);margin-top:4px;font-family:var(--mono)}
+.kpi-val.g{color:var(--green)}.kpi-val.r{color:var(--red)}.kpi-val.gold{color:var(--gold)}.kpi-val.blue{color:var(--blue)}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:16px}
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.rcard-head{background:var(--surface2);padding:10px 16px;font-family:var(--mono);font-size:.72rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.rcard-head .warn-tag{background:rgba(224,85,85,.15);color:var(--red);border:1px solid rgba(224,85,85,.3);font-size:.65rem;padding:2px 7px;border-radius:3px}
+.rcard-head .ok-tag{background:rgba(62,200,122,.12);color:var(--green);border:1px solid rgba(62,200,122,.25);font-size:.65rem;padding:2px 7px;border-radius:3px}
+.rcard-body{padding:14px 16px}
+.row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--border);gap:10px}
+.row:last-child{border-bottom:none}
+.row-label{font-size:.82rem;color:var(--muted);flex:1}
+.row-val{font-family:var(--mono);font-size:.88rem;font-weight:600;white-space:nowrap}
+.row-val.g{color:var(--green)}.row-val.r{color:var(--red)}.row-val.n{color:var(--text)}.row-val.gold{color:var(--gold)}.row-val.blue{color:var(--blue)}
+.row-val.big{font-size:1.1rem}
+.sep-row{border:none;border-top:1px solid var(--border);margin:4px 0}
+.warn-box{background:rgba(224,85,85,.06);border:1px solid rgba(224,85,85,.2);border-radius:8px;padding:14px 16px;font-size:.8rem;color:#d08080;line-height:1.7;margin-bottom:16px}
+.info-box-blue{background:rgba(74,143,212,.06);border:1px solid rgba(74,143,212,.2);border-radius:8px;padding:12px 16px;font-size:.78rem;color:#7aabcf;line-height:1.6;margin-bottom:16px}
+.info-box-green{background:rgba(62,200,122,.05);border:1px solid rgba(62,200,122,.18);border-radius:8px;padding:12px 16px;font-size:.78rem;color:#5ec47a;line-height:1.6;margin-bottom:16px}
+.year-sel{display:flex;gap:6px;flex-wrap:wrap}
+.yr-btn{padding:5px 12px;border-radius:5px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-family:var(--mono);font-size:.78rem;cursor:pointer;transition:.15s}
+.yr-btn.active,.yr-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ======================== TAX MODAL ======================== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:1000;overflow-y:auto;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:24px 16px}
+.modal-box{background:var(--surface);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:820px;overflow:hidden;animation:modalIn .2s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{background:var(--surface2);padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+.modal-title{font-size:1.05rem;font-weight:700;color:var(--text)}
+.modal-title small{font-size:.72rem;color:var(--muted);font-family:var(--mono);margin-right:10px;font-weight:400}
+.modal-close{background:var(--surface);border:1px solid var(--border2);color:var(--muted);font-size:1.1rem;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.modal-close:hover{color:var(--text);border-color:var(--border2)}
+.modal-nav{display:flex;gap:0;overflow-x:auto;background:var(--surface2);border-bottom:1px solid var(--border);padding:0 24px}
+.modal-nav-btn{padding:10px 18px;font-size:.82rem;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s;user-select:none}
+.modal-nav-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.modal-body{padding:28px 24px}
+.modal-section{display:none}
+.modal-section.active{display:block}
+
+/* Tax doc styles */
+.tax-section{margin-bottom:28px}
+.tax-section-title{font-size:.95rem;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.tax-badge{font-size:.65rem;padding:2px 7px;border-radius:3px;font-family:var(--mono);font-weight:600}
+.tax-badge.crit{background:rgba(224,85,85,.2);color:var(--red)}
+.tax-badge.good{background:rgba(62,200,122,.15);color:var(--green)}
+.tax-badge.info{background:rgba(74,143,212,.15);color:var(--blue)}
+.tax-badge.neutral{background:rgba(201,168,76,.15);color:var(--gold)}
+.tax-desc{font-size:.87rem;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.tax-compare{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.tc-old{background:rgba(224,85,85,.07);border:1px solid rgba(224,85,85,.18);border-radius:8px;padding:10px 14px}
+.tc-new{background:rgba(62,200,122,.06);border:1px solid rgba(62,200,122,.18);border-radius:8px;padding:10px 14px}
+.tc-label{font-size:.68rem;font-family:var(--mono);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.tc-label.r{color:var(--red)}.tc-label.g{color:var(--green)}
+.tc-val{font-size:1.25rem;font-weight:700;font-family:var(--mono);color:var(--text)}
+.tc-note{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.tax-rule{background:var(--surface2);border-radius:7px;padding:10px 14px;margin-top:8px;font-size:.82rem;line-height:1.65}
+.tax-rule strong{color:var(--gold)}
+.tax-example{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:7px;padding:10px 14px;font-size:.82rem;font-family:var(--mono);line-height:1.6;margin-top:8px;color:var(--text)}
+.tax-source{font-size:.7rem;font-family:var(--mono);color:var(--muted);margin-top:8px;padding:4px 8px;background:var(--surface2);border-radius:4px;display:inline-block}
+.tax-divider{border:none;border-top:1px solid var(--border);margin:22px 0}
+.exception-box{background:rgba(74,143,212,.06);border:1px solid rgba(74,143,212,.18);border-radius:7px;padding:10px 14px;font-size:.82rem;line-height:1.65;margin-top:8px;color:#7aabcf}
+.exception-box strong{color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- =================== TAX GUIDE MODAL =================== -->
+<div class="modal-overlay" id="taxModal" onclick="if(event.target===this)closeModal()">
+<div class="modal-box">
+  <div class="modal-header">
+    <div class="modal-title">
+      מדריך מיסוי נדל"ן פורטוגל
+      <small>עדכון אפריל 2026 · Construir Portugal</small>
+    </div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+  </div>
+  <div class="modal-nav">
+    <div class="modal-nav-btn active" onclick="switchModalSection('imt',this)">מס רכישה IMT</div>
+    <div class="modal-nav-btn" onclick="switchModalSection('rental',this)">מס שכירות</div>
+    <div class="modal-nav-btn" onclick="switchModalSection('cgt',this)">רווח הון CGT</div>
+    <div class="modal-nav-btn" onclick="switchModalSection('airbnb',this)">Airbnb / AL</div>
+    <div class="modal-nav-btn" onclick="switchModalSection('imi',this)">IMI שנתי</div>
+    <div class="modal-nav-btn" onclick="switchModalSection('summary',this)">סיכום מהיר</div>
+  </div>
+  <div class="modal-body">
+
+    <!-- IMT -->
+    <div class="modal-section active" id="ms-imt">
+      <div class="tax-section">
+        <div class="tax-section-title">🏛️ IMT — מס העברת נכס (Imposto Municipal sobre as Transmissões) <span class="tax-badge crit">שינוי קריטי 2026</span></div>
+        <div class="tax-desc">מס חד-פעמי המשולם בעת הרכישה. בפברואר 2026 אישר הפרלמנט הפורטוגלי (Construir Portugal) שיעור אחיד מהפכני לתושבי חוץ.</div>
+        <div class="tax-compare">
+          <div class="tc-old"><div class="tc-label r">לפני 2026 — מדרגות</div><div class="tc-val">~2.7%</div><div class="tc-note">€5,697 על דירה ב-€210K</div></div>
+          <div class="tc-new"><div class="tc-label g">מ-2026 — שיעור קבוע</div><div class="tc-val">7.5%</div><div class="tc-note">€15,750 על דירה ב-€210K — פי 2.77</div></div>
+        </div>
+        <div class="tax-rule">
+          <strong>מי מושפע:</strong> כל רוכש שאינו תושב מס בפורטוגל בעת הרכישה.<br>
+          <strong>מה חל:</strong> שיעור 7.5% על מחיר הנכס המלא — ללא פטורים, ללא מדרגות.<br>
+          <strong>כניסה לתוקף:</strong> כ-180 יום מאישור (אוגוסט 2026 בממוצע). מי שחתם שטר לפני כן — כפוף לתעריף הישן.
+        </div>
+        <div class="exception-box">
+          <strong>⚡ חריגים — ניתן לקבל החזר לשיעור הרגיל:</strong><br>
+          ① הקונה הופך לתושב מס בפורטוגל תוך <strong>24 חודשים</strong> מהרכישה<br>
+          ② הנכס מושכר בשכירות ארוכת טווח (≤€2,300/חו') תוך <strong>6 חודשים</strong> ולמשך לפחות 36 מ-60 חודשים<br>
+          → במקרים אלה: ניתן לדרוש <strong>החזר ההפרש</strong> מרשות המס
+        </div>
+        <div class="tax-example">
+          דירה: €210,000 × 7.5% = €15,750 IMT<br>
+          לעומת PDF המקורי: €5,697 → <span style="color:var(--red)">הפרש: €10,053</span>
+        </div>
+        <div class="tax-source">מקור: Law 9-A/2026 | Construir Portugal | Lusa 20.2.2026</div>
+      </div>
+
+      <div class="tax-divider"></div>
+
+      <div class="tax-section">
+        <div class="tax-section-title">📋 מס בולים (Imposto de Selo) <span class="tax-badge neutral">ללא שינוי</span></div>
+        <div class="tax-desc">0.8% ממחיר הרכישה — חל על כל עסקה. בנוסף: 0.8% על סכום המשכנתא.</div>
+        <div class="tax-rule">לדירה ב-€210K: <strong>€1,680</strong> על הרכישה + <strong>€1,176</strong> על משכנתא של €147K.</div>
+      </div>
+    </div>
+
+    <!-- RENTAL TAX -->
+    <div class="modal-section" id="ms-rental">
+      <div class="tax-section">
+        <div class="tax-section-title">🏠 מס הכנסה משכירות (IRS Category F) <span class="tax-badge good">שיפור גדול 2026</span></div>
+        <div class="tax-desc">שכירות ארוכת טווח (12+ חודשים) — שינוי דרמטי בשיעורי המס. תושבי חוץ משלמים שיעור אוטונומי (flat rate) על הכנסת שכירות נטו.</div>
+        <div class="tax-compare">
+          <div class="tc-old"><div class="tc-label r">עד 2025</div><div class="tc-val">25%</div><div class="tc-note">תושב חוץ — ברירת מחדל</div></div>
+          <div class="tc-new"><div class="tc-label g">מ-2026 (עד 12/2029)</div><div class="tc-val">10%</div><div class="tc-note">שכ' ≤ €2,300/חו' — כל החוזים</div></div>
+        </div>
+        <div class="tax-rule">
+          <strong>תנאים לשיעור 10%:</strong><br>
+          • חוזה שכירות ארוכת טווח (12+ חודשים) בלבד — לא AL/Airbnb<br>
+          • שכירות חודשית ≤ €2,300<br>
+          • גם חוזים קיימים זכאים — לא רק חדשים<br>
+          • בתוקף עד 31.12.2029 (לאחר מכן חוזר ל-25% אלא אם יוארך)
+        </div>
+        <div class="tax-rule" style="margin-top:8px">
+          <strong>טבלת שיעורים מלאה (2026):</strong><br>
+          • 0% — שכ' מתחת ל-80% מחציון עירוני (RSAA — משטר פשוט)<br>
+          • <strong>10%</strong> — שכ' ≤ €2,300/חו' (ארוכת טווח) ← ברירת מחדל מומלצת<br>
+          • 15% — חוזה 5–10 שנים (ישן)<br>
+          • 10% — חוזה 10–20 שנים (ישן)<br>
+          • 5% — חוזה 20+ שנים (ישן)<br>
+          • 25% — כל מקרה אחר
+        </div>
+        <div class="tax-example">
+          שכירות €1,100/חו' × 12 = €13,200/שנה<br>
+          ניכויים מותרים (IMI + ביטוח + תחזוקה) ≈ 20% → בסיס מס: €10,560<br>
+          מס ב-10%: €1,056 | לעומת 25%: €2,640 → <span style="color:var(--green)">חיסכון: €1,584/שנה</span>
+        </div>
+        <div class="tax-source">מקור: Law 9-A/2026 (6.3.2026) | IRS autónomo 10% | Iberian Property</div>
+      </div>
+      <div class="tax-divider"></div>
+      <div class="tax-section">
+        <div class="tax-section-title">📊 ניכויים מותרים מהשכירות</div>
+        <div class="tax-rule">
+          ניכויים שמפחיתים את בסיס המס:<br>
+          • <strong>IMI</strong> (ארנונה שנתית) — 100%<br>
+          • ביטוח הנכס — 100%<br>
+          • דמי ועד בית (condomínio) — 100%<br>
+          • תחזוקה ותיקונים — בכפוף לקבלות<br>
+          • הוצאות משפטיות הקשורות לשכירות — 100%<br>
+          → בממוצע: 15–30% מההכנסה הגולמית
+        </div>
+      </div>
+    </div>
+
+    <!-- CGT -->
+    <div class="modal-section" id="ms-cgt">
+      <div class="tax-section">
+        <div class="tax-section-title">📈 מס רווח הון (Mais-Valias) <span class="tax-badge good">ללא שינוי — נכון</span></div>
+        <div class="tax-desc">מאז ינואר 2023 — תושבי חוץ נהנים מאותה הטבה כמו תושבים: 50% מהרווח פטור ממס.</div>
+        <div class="tax-rule">
+          <strong>חישוב:</strong> (מחיר מכירה − עלות רכישה − הוצאות עסקה) × 50% = חייב במס<br>
+          השיעור לפי מדרגות מס הכנסה על הכנסה עולמית כוללת (12.5%–48%)<br>
+          → שיעור אפקטיבי ממוצע: <strong>12%–18%</strong> (כ-14% על רווח ממוצע)
+        </div>
+        <div class="tax-compare">
+          <div class="tc-old"><div class="tc-label r">לפני 2023</div><div class="tc-val">28%</div><div class="tc-note">על 100% מהרווח</div></div>
+          <div class="tc-new"><div class="tc-label g">מ-2023 ועכשיו</div><div class="tc-val">~14%</div><div class="tc-note">אפקטיבי (50% × 28%)</div></div>
+        </div>
+        <div class="exception-box">
+          <strong>🆕 פטור חדש 2026 (עד 12/2029):</strong><br>
+          פטור מלא ממס רווח הון אם:<br>
+          ① מוכרים נכס מגורים<br>
+          ② המתמורד מושקע ברכישת נכס אחר <strong>להשכרה מתונה (≤€2,300/חו')</strong><br>
+          ③ ההשקעה החוזרת מתבצעת בין 24 חודשים לפני ל-36 חודשים אחרי המכירה<br>
+          → <strong>פטור מלא</strong> ולא רק חלקי
+        </div>
+        <div class="tax-example">
+          רווח הון: €84,000<br>
+          חייב (50%): €42,000<br>
+          מס ב-28%: €11,760 → אפקטיבי <span style="color:var(--gold)">~14%</span><br>
+          עם פטור השקעה חוזרת: <span style="color:var(--green)">€0</span>
+        </div>
+        <div class="tax-source">מקור: Finance Act 2023 | Circular 20255/2023 | Law 9-A/2026 | PwC Portugal</div>
+      </div>
+    </div>
+
+    <!-- AIRBNB -->
+    <div class="modal-section" id="ms-airbnb">
+      <div class="tax-section">
+        <div class="tax-section-title">🏨 Airbnb / Alojamento Local (AL) <span class="tax-badge info">ללא שינוי</span></div>
+        <div class="tax-desc">השכרה קצרת טווח (לא חל עליה שיעור ה-10%). נדרש רישיון AL מהמועצה המקומית.</div>
+        <div class="tax-rule">
+          <strong>Simplified Regime (תושב חוץ):</strong><br>
+          הכנסה גולמית × 35% = בסיס מס<br>
+          בסיס מס × 25% = מס בפועל<br>
+          → <strong>8.75% אפקטיבי</strong> על ההכנסה הגולמית
+        </div>
+        <div class="warn-inline" style="margin-top:10px">
+          ⚠ <strong>תקרת הכנסה:</strong> הכנסה שנתית מעל <strong>€27,360</strong> → מקדם עולה מ-35% ל-50%<br>
+          → שיעור אפקטיבי עולה ל-<strong>12.5%</strong>
+        </div>
+        <div class="tax-rule" style="margin-top:8px">
+          <strong>עמלת ניהול:</strong> 15–25% (חברות ניהול) + 3% Airbnb<br>
+          <strong>VAT (IVA):</strong> 6% אם הכנסה שנתית > €10,000<br>
+          <strong>Tourist tax:</strong> €2–4 ללילה (תלוי עיר) — מועבר לאורח<br>
+          <strong>רישיון AL:</strong> נדרש, ניתן להעביר עם מכירת הנכס (מ-11/2024)
+        </div>
+        <div class="tax-example">
+          הכנסה שנתית: €33,000 (מעל תקרה)<br>
+          בסיס מס (50%): €16,500<br>
+          מס (25%): €4,125 → <span style="color:var(--orange)">12.5% אפקטיבי</span><br>
+          <br>
+          הכנסה שנתית: €20,000 (מתחת תקרה)<br>
+          בסיס מס (35%): €7,000<br>
+          מס (25%): €1,750 → <span style="color:var(--green)">8.75% אפקטיבי</span>
+        </div>
+        <div class="tax-source">מקור: AT Portugal | Decree-Law 76/2024 | Sovereign Group</div>
+      </div>
+    </div>
+
+    <!-- IMI -->
+    <div class="modal-section" id="ms-imi">
+      <div class="tax-section">
+        <div class="tax-section-title">🏛️ IMI — ארנונה שנתית (Imposto Municipal Imóveis) <span class="tax-badge neutral">ללא שינוי עיקרי</span></div>
+        <div class="tax-rule">
+          <strong>שיעור:</strong> 0.3%–0.45% מ-VPT (שווי מאזני — בד"כ נמוך ב-60–70% ממחיר שוק)<br>
+          <strong>פורטו/ליסבון:</strong> ~0.35% מ-VPT<br>
+          <strong>תשלום:</strong> שנתי (אפריל עד יוני)
+        </div>
+        <div class="exception-box">
+          <strong>🆕 פטור AIMI חדש 2026:</strong><br>
+          נכסים המושכרים בשכירות ≤€2,300/חו' — <strong>פטורים מ-AIMI</strong> (מס IMI נוסף של 0.4% על נכסים מעל €600K).<br>
+          לנכסים מתחת ל-€600K: AIMI לא חל ממילא.
+        </div>
+        <div class="tax-example">
+          נכס €210K → VPT ~€90K (בד"כ)<br>
+          IMI: €90,000 × 0.35% = <span style="color:var(--gold)">~€315/שנה</span>
+        </div>
+        <div class="tax-source">מקור: AT Portugal 2025 | AIMI Law 9-A/2026</div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="modal-section" id="ms-summary">
+      <div class="tax-section">
+        <div class="tax-section-title">📋 סיכום מהיר — כל המיסים (תושב חוץ ישראלי, 2026)</div>
+        <div class="tax-rule" style="font-family:var(--mono);font-size:.82rem;line-height:2">
+          <table style="width:100%;border-collapse:collapse">
+            <tr style="color:var(--gold);font-size:.72rem"><th style="text-align:right;padding-bottom:8px">מס</th><th style="text-align:right;padding-bottom:8px">שיעור</th><th style="text-align:right;padding-bottom:8px">עדכון</th></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">IMT — רכישה</td><td><span style="color:var(--red)">7.5%</span> קבוע</td><td><span style="color:var(--red);font-size:.75rem">שינוי 2026 ⚠</span></td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">מס בולים</td><td>0.8%</td><td><span style="color:var(--muted);font-size:.75rem">ללא שינוי</span></td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">שכירות ארוכת טווח</td><td><span style="color:var(--green)">10%</span> (≤€2,300)</td><td><span style="color:var(--green);font-size:.75rem">שיפור 2026 ✓</span></td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">שכירות AL/Airbnb</td><td>8.75% אפקטיבי</td><td><span style="color:var(--muted);font-size:.75rem">ללא שינוי</span></td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">רווח הון (מכירה)</td><td>~14% אפקטיבי</td><td><span style="color:var(--muted);font-size:.75rem">מ-2023</span></td></tr>
+            <tr style="border-top:1px solid var(--border)"><td style="padding:6px 0;color:var(--text)">IMI שנתי</td><td>~0.35% מ-VPT</td><td><span style="color:var(--muted);font-size:.75rem">ללא שינוי</span></td></tr>
+          </table>
+        </div>
+        <div class="good-inline" style="margin-top:12px">
+          ✅ <strong>הזדמנות 2026:</strong> שיעור מס שכירות ירד מ-25% ל-10% → חיסכון ~€1,600/שנה על שכ' €1,100/חו'.<br>
+          פטור מלא מ-CGT אם מוכרים ומשקיעים שוב בהשכרה מתונה.
+        </div>
+        <div class="warn-box" style="margin-top:10px">
+          ⚠ <strong>עלות רכישה זינקה:</strong> IMT עלה מ-~2.7% ל-7.5% לתושבי חוץ. על €210K: +€10,053.<br>
+          מחשבון זה מעודכן לשיעורי 2026. מומלץ תמיד לוודא עם רו"ח פורטוגלי לפני החתימה.
+        </div>
+        <div class="tax-source">מקור: Law 9-A/2026 (6.3.2026) | PwC Portugal | Idealista | Portugal Resident | Your Overseas Home</div>
+      </div>
+    </div>
+
+  </div><!-- modal-body -->
+</div><!-- modal-box -->
+</div><!-- modal-overlay -->
+
+<!-- =================== HEADER =================== -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">נדל"ן <span>פורטוגל</span></div>
+    <div class="ver-badge">v3.0 · 2026</div>
+    <div class="update-badge" onclick="openModal('summary')">⚡ עדכון מיסוי אפריל 2026</div>
+    <div class="header-right">
+      <div class="rate-pill"><span>€1 =</span><input type="number" id="eurIls" value="3.98" step="0.01" min="1" oninput="['exit','longterm','airbnb','noloan'].forEach(t=>calc(t))"><span>₪</span></div>
+      <button class="tax-guide-btn" onclick="openModal('imt')">📖 מדריך מיסוי מלא</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('exit')">🚪 EXIT — 5 שנים</div>
+    <div class="tab" onclick="switchTab('longterm')">📅 החזקה ארוכה</div>
+    <div class="tab" onclick="switchTab('airbnb')">🏨 Airbnb / AL</div>
+    <div class="tab" onclick="switchTab('noloan')">🔓 ללא משכנתא</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXIT TAB                                                       -->
+<!-- ============================================================ -->
+<div id="page-exit" class="page active">
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-title">⚙️ פרמטרי עסקה</div>
+
+    <div class="section-label">נכס ומימון</div>
+    <div class="field"><label>מחיר הדירה</label>
+      <div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="e_price" value="210000" step="5000" oninput="autoIMT('e');calc('exit')"></div>
+    </div>
+    <div class="field">
+      <label>הון עצמי: <strong id="e_eqLabel">30</strong>%</label>
+      <input type="range" id="e_eqSlider" min="20" max="100" value="30" oninput="document.getElementById('e_eqLabel').textContent=this.value;calc('exit')">
+      <div class="range-labels"><span>20%</span><span>60%</span><span>100%</span></div>
+    </div>
+    <div class="field"><label>ריבית משכנתא (%)</label><input type="number" id="e_rate" value="3" step="0.1" min="0.1" oninput="calc('exit')"></div>
+    <div class="field"><label>תקופת משכנתא (שנים)</label><input type="number" id="e_term" value="28" step="1" min="5" max="40" oninput="calc('exit')"></div>
+
+    <hr class="section-sep">
+    <div class="section-label">💼 הוצאות ליווי</div>
+    <div class="field"><div class="trio">
+      <div><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="e_accompEur" value="0" step="100" oninput="syncAccomp('e','eur');calc('exit')"></div><div class="sub-label">יורו</div></div>
+      <div><input type="number" id="e_accompPct" value="0" step="0.1" oninput="syncAccomp('e','pct');calc('exit')"><div class="sub-label">% מהנכס</div></div>
+      <div><input type="number" id="e_accompIls" value="0" step="500" oninput="syncAccomp('e','ils');calc('exit')"><div class="sub-label">₪</div></div>
+    </div></div>
+
+    <hr class="section-sep">
+    <div class="section-label">🏠 שכירות ו-EXIT</div>
+    <div class="field"><label>שכירות חודשית (€)</label>
+      <div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="e_rent" value="1100" step="50" oninput="calc('exit')"></div>
+    </div>
+    <div class="field"><label>אופק מכירה (חודשים)</label><input type="number" id="e_hold" value="60" step="6" min="12" oninput="calc('exit')"></div>
+    <div class="field"><label>מחיר מכירה יעד (€)</label>
+      <div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="e_exit" value="294000" step="5000" oninput="calc('exit')"></div>
+    </div>
+    <div class="field"><label>עמלת פירעון מוקדם (%)</label><input type="number" id="e_prepay" value="0.5" step="0.1" min="0" oninput="calc('exit')"></div>
+
+    <hr class="section-sep">
+    <div class="section-label">💸 הוצאות עסקה <button class="info-btn" onclick="openModal('imt')" title="מדריך IMT">ℹ️</button></div>
+    <div class="field">
+      <label>מס IMT — 7.5% לתושבי חוץ <button class="info-btn" onclick="openModal('imt')" title="מה זה IMT?">ℹ️</button></label>
+      <div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="e_imt" value="15750" step="100" oninput="calc('exit')"></div>
+      <div class="warn-inline">⚠ 2026: 7.5% קבוע לתושב חוץ. חריגים → <span style="cursor:pointer;color:var(--blue);text-decoration:underline" onclick="openModal('imt')">לפרטים</span></div>
+    </div>
+    <div class="field"><label>מס בולים 0.8% (€)</label><input type="number" id="e_stamp" value="1680" step="100" oninput="calc('exit')"></div>
+    <div class="field"><label>נוטריון (€)</label><input type="number" id="e_notary" value="1500" step="100" oninput="calc('exit')"></div>
+    <div class="field"><label>הוצאות נלוות (€)</label><input type="number" id="e_misc" value="600" step="100" oninput="calc('exit')"></div>
+    <div class="field"><label>עמלות בנק (€)</label><input type="number" id="e_bank" value="720" step="100" oninput="calc('exit')"></div>
+    <div class="field"><label>מס בולים משכנתא (€)</label><input type="number" id="e_mstamp" value="1176" step="100" oninput="calc('exit')"></div>
+    <div class="field"><label>שכ"ט עו"ד (€)</label><input type="number" id="e_lawyer" value="2700" step="100" oninput="calc('exit')"></div>
+
+    <hr class="section-sep">
+    <div class="section-label">🧾 מיסוי <button class="info-btn" onclick="openModal('rental')" title="מדריך מס שכירות">ℹ️</button></div>
+    <div class="field">
+      <label>מס שכירות <span class="new-tag">2026</span> <button class="info-btn" onclick="openModal('rental')">ℹ️</button></label>
+      <select id="e_rentTax" onchange="calc('exit')">
+        <option value="0.10" selected>10% — שכ' ≤€2,300 ארוכת טווח ✓ 2026</option>
+        <option value="0.25">25% — תושב חוץ (כללי)</option>
+        <option value="0.15">15% — חוזה 5–10 שנים</option>
+        <option value="0.05">5% — חוזה 20+ שנים</option>
+        <option value="0">0% — RSAA / ללא מס</option>
+      </select>
+      <div class="good-inline">✓ ברירת מחדל: 10% לפי Law 9-A/2026</div>
+    </div>
+    <div class="field"><label>% ניכויים מותרים <button class="info-btn" onclick="openModal('rental')">ℹ️</button></label>
+      <input type="number" id="e_rentDeduct" value="20" step="5" min="0" max="80" oninput="calc('exit')">
+    </div>
+    <div class="field">
+      <label>מס רווח הון <button class="info-btn" onclick="openModal('cgt')">ℹ️</button></label>
+      <select id="e_cgTax" onchange="calc('exit')">
+        <option value="0.14" selected>~14% — תושב חוץ (50% × 28%)</option>
+        <option value="0.10">~10% — תושב חוץ (50% × 20%)</option>
+        <option value="0">0% — פטור (השקעה חוזרת)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="check-row"><input type="checkbox" id="e_cgExempt" onchange="if(this.checked){document.getElementById('e_cgTax').value='0'}else{document.getElementById('e_cgTax').value='0.14'};calc('exit')"> פטור CGT — השקעה חוזרת בהשכרה <button class="info-btn" onclick="openModal('cgt')">ℹ️</button></label>
+    </div>
+  </div>
+  <div class="results-area" id="exit-results"></div>
+</div>
+</div>
+
+<!-- LONG TERM TAB -->
+<div id="page-longterm" class="page">
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-title">⚙️ פרמטרי עסקה</div>
+    <div class="section-label">נכס ומימון</div>
+    <div class="field"><label>מחיר הדירה</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="l_price" value="210000" step="5000" oninput="calc('longterm')"></div></div>
+    <div class="field"><label>הון עצמי: <strong id="l_eqLabel">30</strong>%</label>
+      <input type="range" id="l_eqSlider" min="20" max="100" value="30" oninput="document.getElementById('l_eqLabel').textContent=this.value;calc('longterm')">
+      <div class="range-labels"><span>20%</span><span>60%</span><span>100%</span></div>
+    </div>
+    <div class="field"><label>ריבית משכנתא (%)</label><input type="number" id="l_rate" value="3" step="0.1" oninput="calc('longterm')"></div>
+    <div class="field"><label>תקופת משכנתא (שנים)</label><input type="number" id="l_term" value="28" step="1" min="5" max="40" oninput="calc('longterm')"></div>
+    <hr class="section-sep">
+    <div class="section-label">💼 הוצאות ליווי</div>
+    <div class="field"><div class="trio">
+      <div><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="l_accompEur" value="0" step="100" oninput="syncAccomp('l','eur');calc('longterm')"></div><div class="sub-label">יורו</div></div>
+      <div><input type="number" id="l_accompPct" value="0" step="0.1" oninput="syncAccomp('l','pct');calc('longterm')"><div class="sub-label">%</div></div>
+      <div><input type="number" id="l_accompIls" value="0" step="500" oninput="syncAccomp('l','ils');calc('longterm')"><div class="sub-label">₪</div></div>
+    </div></div>
+    <hr class="section-sep">
+    <div class="section-label">🏠 שכירות</div>
+    <div class="field"><label>שכירות חודשית (€)</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="l_rent" value="1100" step="50" oninput="calc('longterm')"></div></div>
+    <div class="field"><label>עליית שכירות שנתית (%)</label><input type="number" id="l_rentGrowth" value="2" step="0.5" oninput="calc('longterm')"></div>
+    <div class="field"><label>הצג שנה לניתוח</label><div class="year-sel" id="l_yearBtns"></div></div>
+    <div class="field"><label>IMI שנתי (% מערך הנכס) <button class="info-btn" onclick="openModal('imi')">ℹ️</button></label><input type="number" id="l_imi" value="0.35" step="0.05" oninput="calc('longterm')"></div>
+    <hr class="section-sep">
+    <div class="section-label">💸 הוצאות עסקה</div>
+    <div class="field"><label>סה"כ הוצ' עסקה (כולל IMT 7.5%) <button class="info-btn" onclick="openModal('imt')">ℹ️</button></label><input type="number" id="l_txCosts" value="24072.75" step="100" oninput="calc('longterm')"></div>
+    <hr class="section-sep">
+    <div class="section-label">🧾 מיסוי <button class="info-btn" onclick="openModal('rental')">ℹ️</button></div>
+    <div class="field"><label>מס שכירות <span class="new-tag">2026</span></label>
+      <select id="l_rentTax" onchange="calc('longterm')">
+        <option value="0.10" selected>10% — שכ' ≤€2,300 ✓ 2026</option>
+        <option value="0.25">25% — תושב חוץ כללי</option>
+        <option value="0.15">15% — חוזה 5–10 שנים</option>
+        <option value="0.05">5% — חוזה 20+ שנים</option>
+        <option value="0">0% — RSAA</option>
+      </select>
+    </div>
+    <div class="field"><label>% ניכויים מותרים</label><input type="number" id="l_rentDeduct" value="20" step="5" oninput="calc('longterm')"></div>
+  </div>
+  <div class="results-area" id="longterm-results"></div>
+</div>
+</div>
+
+<!-- AIRBNB TAB -->
+<div id="page-airbnb" class="page">
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-title">🏨 Airbnb / Alojamento Local</div>
+    <div class="section-label">נכס ומימון</div>
+    <div class="field"><label>מחיר הדירה</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="a_price" value="210000" step="5000" oninput="calc('airbnb')"></div></div>
+    <div class="field"><label>הון עצמי: <strong id="a_eqLabel">30</strong>%</label>
+      <input type="range" id="a_eqSlider" min="20" max="100" value="30" oninput="document.getElementById('a_eqLabel').textContent=this.value;calc('airbnb')">
+      <div class="range-labels"><span>20%</span><span>60%</span><span>100%</span></div>
+    </div>
+    <div class="field"><label>ריבית משכנתא (%)</label><input type="number" id="a_rate" value="3" step="0.1" oninput="calc('airbnb')"></div>
+    <div class="field"><label>תקופת משכנתא (שנים)</label><input type="number" id="a_term" value="28" step="1" oninput="calc('airbnb')"></div>
+    <hr class="section-sep">
+    <div class="section-label">💼 הוצאות ליווי</div>
+    <div class="field"><div class="trio">
+      <div><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="a_accompEur" value="0" step="100" oninput="syncAccomp('a','eur');calc('airbnb')"></div><div class="sub-label">יורו</div></div>
+      <div><input type="number" id="a_accompPct" value="0" step="0.1" oninput="syncAccomp('a','pct');calc('airbnb')"><div class="sub-label">%</div></div>
+      <div><input type="number" id="a_accompIls" value="0" step="500" oninput="syncAccomp('a','ils');calc('airbnb')"><div class="sub-label">₪</div></div>
+    </div></div>
+    <hr class="section-sep">
+    <div class="section-label">🏨 פרמטרי Airbnb <button class="info-btn" onclick="openModal('airbnb')">ℹ️</button></div>
+    <div class="field"><label>מחיר לילה ממוצע (€)</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="a_night" value="100" step="5" oninput="calc('airbnb')"></div></div>
+    <div class="field"><label>תפוסה: <strong id="a_occLabel">70</strong>%</label>
+      <input type="range" id="a_occSlider" min="20" max="95" value="70" oninput="document.getElementById('a_occLabel').textContent=this.value;calc('airbnb')">
+      <div class="range-labels"><span>20%</span><span>70%</span><span>95%</span></div>
+    </div>
+    <div class="field"><label>עמלת ניהול (%)</label><input type="number" id="a_mgmt" value="20" step="1" min="0" max="50" oninput="calc('airbnb')"></div>
+    <div class="field"><label>עמלת Airbnb (%)</label><input type="number" id="a_platform" value="3" step="0.5" oninput="calc('airbnb')"></div>
+    <div class="field"><label>עלות ניקיון לשהייה (€)</label><input type="number" id="a_clean" value="40" step="5" oninput="calc('airbnb')"></div>
+    <div class="field"><label>שהייה ממוצעת (לילות)</label><input type="number" id="a_avgStay" value="4" step="1" min="1" oninput="calc('airbnb')"></div>
+    <div class="field"><label>תחזוקה שנתית (€)</label><input type="number" id="a_maint" value="2000" step="200" oninput="calc('airbnb')"></div>
+    <div class="field"><label>ביטוח + VAT + תיירות (€/שנה)</label><input type="number" id="a_misc" value="1200" step="100" oninput="calc('airbnb')"></div>
+    <div class="field"><label>IMI שנתי (% מהנכס) <button class="info-btn" onclick="openModal('imi')">ℹ️</button></label><input type="number" id="a_imi" value="0.35" step="0.05" oninput="calc('airbnb')"></div>
+    <hr class="section-sep">
+    <div class="section-label">💸 הוצאות עסקה <button class="info-btn" onclick="openModal('imt')">ℹ️</button></div>
+    <div class="field"><label>סה"כ הוצ' עסקה (€)</label><input type="number" id="a_txCosts" value="24072.75" step="100" oninput="calc('airbnb')"></div>
+    <div class="section-label" style="margin-top:14px">🧾 מס AL <button class="info-btn" onclick="openModal('airbnb')">ℹ️</button></div>
+    <div class="good-inline">מס AL לתושב חוץ: 25%×35% = <strong>8.75%</strong> אפקטיבי</div>
+    <div class="warn-inline" style="margin-top:6px" id="a_alWarn" style="display:none">⚠ הכנסה מעל €27,360 → מקדם 50% → מס 12.5% אפקטיבי</div>
+  </div>
+  <div class="results-area" id="airbnb-results"></div>
+</div>
+</div>
+
+<!-- NO LOAN TAB -->
+<div id="page-noloan" class="page">
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-title">🔓 רכישה ללא משכנתא</div>
+    <div class="section-label">נכס</div>
+    <div class="field"><label>מחיר הדירה (€)</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="n_price" value="210000" step="5000" oninput="autoIMT('n');calc('noloan')"></div></div>
+    <hr class="section-sep">
+    <div class="section-label">💼 הוצאות ליווי</div>
+    <div class="field"><div class="trio">
+      <div><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="n_accompEur" value="0" step="100" oninput="syncAccomp('n','eur');calc('noloan')"></div><div class="sub-label">יורו</div></div>
+      <div><input type="number" id="n_accompPct" value="0" step="0.1" oninput="syncAccomp('n','pct');calc('noloan')"><div class="sub-label">%</div></div>
+      <div><input type="number" id="n_accompIls" value="0" step="500" oninput="syncAccomp('n','ils');calc('noloan')"><div class="sub-label">₪</div></div>
+    </div></div>
+    <hr class="section-sep">
+    <div class="section-label">🏠 שכירות</div>
+    <div class="field"><label>שכירות חודשית (€)</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="n_rent" value="1100" step="50" oninput="calc('noloan')"></div></div>
+    <div class="field"><label>עליית שכירות שנתית (%)</label><input type="number" id="n_rentGrowth" value="2" step="0.5" oninput="calc('noloan')"></div>
+    <div class="field"><label>IMI שנתי (% מהנכס) <button class="info-btn" onclick="openModal('imi')">ℹ️</button></label><input type="number" id="n_imi" value="0.35" step="0.05" oninput="calc('noloan')"></div>
+    <div class="field"><label>תחזוקה שנתית (€)</label><input type="number" id="n_maint" value="1200" step="200" oninput="calc('noloan')"></div>
+    <hr class="section-sep">
+    <div class="section-label">💸 הוצאות עסקה <button class="info-btn" onclick="openModal('imt')">ℹ️</button></div>
+    <div class="field">
+      <label>מס IMT — 7.5% <button class="info-btn" onclick="openModal('imt')">ℹ️</button></label>
+      <div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="n_imt" value="15750" step="100" oninput="calc('noloan')"></div>
+    </div>
+    <div class="field"><label>מס בולים (€)</label><input type="number" id="n_stamp" value="1680" step="100" oninput="calc('noloan')"></div>
+    <div class="field"><label>נוטריון + עו"ד + שונות (€)</label><input type="number" id="n_other" value="4800" step="100" oninput="calc('noloan')"></div>
+    <hr class="section-sep">
+    <div class="section-label">🧾 מיסוי <button class="info-btn" onclick="openModal('rental')">ℹ️</button></div>
+    <div class="field"><label>מס שכירות <span class="new-tag">2026</span></label>
+      <select id="n_rentTax" onchange="calc('noloan')">
+        <option value="0.10" selected>10% — שכ' ≤€2,300 ✓ 2026</option>
+        <option value="0.25">25% — כללי</option>
+        <option value="0.15">15% — 5–10 שנים</option>
+        <option value="0">0% — RSAA</option>
+      </select>
+    </div>
+    <div class="field"><label>% ניכויים מותרים</label><input type="number" id="n_rentDeduct" value="20" step="5" oninput="calc('noloan')"></div>
+    <div class="field"><label>מס רווח הון <button class="info-btn" onclick="openModal('cgt')">ℹ️</button></label>
+      <select id="n_cgTax" onchange="calc('noloan')">
+        <option value="0.14" selected>~14% (50%×28%)</option>
+        <option value="0.10">~10% (50%×20%)</option>
+        <option value="0">0% — פטור השקעה חוזרת</option>
+      </select>
+    </div>
+    <hr class="section-sep">
+    <div class="section-label">🚪 מכירה (אופציונלי)</div>
+    <div class="field"><label>מחיר מכירה יעד (€)</label><div class="input-with-unit"><span class="input-unit">€</span><input type="number" id="n_exit" value="294000" step="5000" oninput="calc('noloan')"></div></div>
+    <div class="field"><label>שנות החזקה</label><input type="number" id="n_holdYears" value="5" step="1" min="1" oninput="calc('noloan')"></div>
+  </div>
+  <div class="results-area" id="noloan-results"></div>
+</div>
+</div>
+
+<script>
+// ============================================================
+// UTILITIES
+// ============================================================
+const q = id => document.getElementById(id);
+const fmt = (n,d=0) => '€' + n.toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtILS = n => '₪' + Math.round(n).toLocaleString('he-IL');
+const pct = (n,d=2) => (!isFinite(n)||isNaN(n)?'—':n.toFixed(d)+'%');
+const cls = n => n>0?'g':n<0?'r':'n';
+const getRate = () => parseFloat(q('eurIls').value)||3.98;
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(section='imt'){
+  q('taxModal').classList.add('open');
+  document.body.style.overflow='hidden';
+  switchModalSection(section, document.querySelector(`[onclick*="'${section}'"]`));
+}
+function closeModal(){
+  q('taxModal').classList.remove('open');
+  document.body.style.overflow='';
+}
+function switchModalSection(id, btn){
+  document.querySelectorAll('.modal-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.modal-nav-btn').forEach(b=>b.classList.remove('active'));
+  const el = q('ms-'+id);
+  if(el) el.classList.add('active');
+  if(btn) btn.classList.add('active');
+  else {
+    const b = document.querySelector(`.modal-nav-btn[onclick*="'${id}'"]`);
+    if(b) b.classList.add('active');
+  }
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// ============================================================
+// AUTO IMT — 7.5% of price
+// ============================================================
+function autoIMT(prefix){
+  const price = parseFloat(q(`${prefix}_price`).value)||0;
+  const imtEl = q(`${prefix}_imt`);
+  if(imtEl) imtEl.value = Math.round(price*0.075);
+}
+
+// ============================================================
+// SYNC ACCOMP
+// ============================================================
+function syncAccomp(p, src){
+  const rate=getRate();
+  const priceEl=q(`${p}_price`);
+  const price=priceEl?parseFloat(priceEl.value)||0:0;
+  const eE=q(`${p}_accompEur`),pE=q(`${p}_accompPct`),iE=q(`${p}_accompIls`);
+  let ev=parseFloat(eE.value)||0,pv=parseFloat(pE.value)||0;
+  if(src==='eur'){pE.value=price>0?(ev/price*100).toFixed(2):0;iE.value=Math.round(ev*rate)}
+  else if(src==='pct'){eE.value=(pv/100*price).toFixed(2);iE.value=Math.round(parseFloat(eE.value)*rate)}
+  else{eE.value=(parseFloat(iE.value)/rate).toFixed(2);pE.value=price>0?(parseFloat(iE.value)/rate/price*100).toFixed(2):0}
+}
+
+// ============================================================
+// TAB SWITCHING
+// ============================================================
+let longtermYear=5;
+function switchTab(tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  q(`page-${tab}`).classList.add('active');
+  const idx=['exit','longterm','airbnb','noloan'].indexOf(tab);
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  calc(tab);
+}
+
+// ============================================================
+// MORTGAGE HELPERS
+// ============================================================
+function mortMonthly(P,r,y){if(P<=0)return 0;const m=r/100/12,n=y*12;if(m===0)return P/n;return P*m*Math.pow(1+m,n)/(Math.pow(1+m,n)-1)}
+function balAfter(P,r,y,mo){if(P<=0)return 0;const m=r/100/12,n=y*12;if(m===0)return Math.max(0,P-(P/n)*mo);return P*(Math.pow(1+m,n)-Math.pow(1+m,mo))/(Math.pow(1+m,n)-1)}
+function intPaid(P,r,y,mo){const mm=mortMonthly(P,r,y),pp=P-balAfter(P,r,y,mo);return mm*mo-pp}
+function yearBreak(P,r,y,yr){const m=r/100/12,mm=mortMonthly(P,r,y);let bal=balAfter(P,r,y,(yr-1)*12),ti=0,tp=0;for(let i=0;i<12;i++){const ip=bal*m,pp=mm-ip;ti+=ip;tp+=pp;bal-=pp}return{interest:ti,principal:tp,monthly:mm}}
+
+// ============================================================
+// HTML HELPERS
+// ============================================================
+function row(lbl,val,c='n'){return`<div class="row"><span class="row-label">${lbl}</span><span class="row-val ${c}">${val}</span></div>`}
+function bigRow(lbl,eur,c,ils=true){const ilsStr=ils?` <span style="font-size:.72rem;color:var(--muted)">${fmtILS(eur*getRate())}</span>`:'';return`<div class="row"><span class="row-label"><strong>${lbl}</strong></span><span class="row-val ${c} big">${fmt(eur,2)}${ilsStr}</span></div>`}
+function sep(){return`<hr class="sep-row">`}
+function kpi(lbl,val,c,sub=''){return`<div class="kpi-card"><div class="kpi-label">${lbl}</div><div class="kpi-val ${c}">${val}</div>${sub?`<div class="kpi-sub">${sub}</div>`:''}</div>`}
+function card(title,body,tag=''){return`<div class="rcard"><div class="rcard-head">${title}${tag}</div><div class="rcard-body">${body}</div></div>`}
+function infoBtn(section){return`<button class="info-btn" onclick="openModal('${section}')" style="margin-right:4px">ℹ️</button>`}
+
+// ============================================================
+// CALC DISPATCHER
+// ============================================================
+function calc(tab){
+  if(tab==='exit')calcExit();
+  else if(tab==='longterm')calcLongterm();
+  else if(tab==='airbnb')calcAirbnb();
+  else if(tab==='noloan')calcNoloan();
+}
+
+// ============================================================
+// EXIT
+// ============================================================
+function calcExit(){
+  const rate=getRate(), price=parseFloat(q('e_price').value)||0;
+  const eqPct=(parseInt(q('e_eqSlider').value)||30)/100;
+  const intRate=parseFloat(q('e_rate').value)||3, term=parseInt(q('e_term').value)||28;
+  const accomp=parseFloat(q('e_accompEur').value)||0;
+  const monthlyRent=parseFloat(q('e_rent').value)||0, holdMo=parseInt(q('e_hold').value)||60;
+  const exitPrice=parseFloat(q('e_exit').value)||0, prepayPct=(parseFloat(q('e_prepay').value)||0)/100;
+  const txCosts=['e_imt','e_stamp','e_notary','e_misc','e_bank','e_mstamp','e_lawyer'].reduce((s,id)=>s+(parseFloat(q(id).value)||0),0)+accomp;
+  const rentTaxRate=parseFloat(q('e_rentTax').value)||0;
+  const rentDeductPct=(parseFloat(q('e_rentDeduct').value)||0)/100;
+  const cgTaxRate=parseFloat(q('e_cgTax').value)||0;
+  const equity=price*eqPct, loan=price-equity;
+  const totalCash=equity+txCosts;
+  const mm=mortMonthly(loan,intRate,term);
+  const remMort=balAfter(loan,intRate,term,holdMo);
+  const prinPaid=loan-remMort, intTotal=intPaid(loan,intRate,term,holdMo);
+  const prepay=remMort*prepayPct, totalRent=monthlyRent*holdMo;
+  const taxableRent=totalRent*(1-rentDeductPct), rentTaxAmt=taxableRent*rentTaxRate;
+  const netRent=totalRent-rentTaxAmt;
+  const capGain=exitPrice-remMort-prepay-equity-txCosts;
+  const cgTaxAmt=Math.max(0,capGain)*cgTaxRate;
+  const netCapGain=capGain-cgTaxAmt;
+  const netProfit=netCapGain+netRent-intTotal;
+  const retPct=totalCash>0?(netProfit/totalCash)*100:0;
+  const irr=totalCash>0?(Math.pow(1+netProfit/totalCash,12/holdMo)-1)*100:0;
+  const oldIMT=Math.round(price*0.027);
+  const newIMT=Math.round(price*0.075);
+  const imtDiff=newIMT-oldIMT;
+
+  q('exit-results').innerHTML=`
+    <div class="kpi-bar">
+      ${kpi('תשואה כוללת',pct(retPct,1),cls(retPct),`${fmt(totalCash)} מזומן`)}
+      ${kpi('IRR שנתי',pct(irr,1),cls(irr),`${holdMo} חודשים`)}
+      ${kpi('רווח נקי אחרי מס',fmt(netProfit,0),cls(netProfit),fmtILS(netProfit*rate))}
+      ${kpi('מינוף',eqPct<1?'×'+(1/eqPct).toFixed(1):'ללא','blue')}
+    </div>
+
+    <div class="info-box-green" style="cursor:pointer" onclick="openModal('summary')">
+      ✓ <strong>מעודכן לחוק 9-A/2026:</strong> IMT 7.5% | מס שכירות ${Math.round(rentTaxRate*100)}% | CGT ${cgTaxRate===0?'פטור':Math.round(cgTaxRate*100)+'%'}
+      &nbsp;<span style="font-size:.75rem;color:var(--green);text-decoration:underline">→ מדריך מיסוי מלא</span>
+    </div>
+
+    <div class="cards-grid">
+      ${card('📐 מבנה ההשקעה',`
+        ${row('מחיר הדירה',fmt(price),'n')}
+        ${row('הון עצמי ('+Math.round(eqPct*100)+'%)',fmt(equity),'n')}
+        ${row('משכנתא',fmt(loan),'n')}
+        ${row('הוצאות עסקה (כולל IMT 7.5%)',fmt(txCosts),'r')}
+        ${accomp>0?row('מתוכן: ליווי/יועץ',fmt(accomp)+' / '+fmtILS(accomp*rate),'r'):''}
+        ${sep()}
+        ${bigRow('מזומן סה"כ',totalCash,'gold')}
+        ${row('שווי ₪',fmtILS(totalCash*rate),'muted')}
+      `)}
+      ${card('🏦 משכנתא',`
+        ${row('החזר חודשי',fmt(mm,2),'n')}
+        ${row('ריבית ל-'+holdMo+' חודשים',fmt(intTotal,2),'r')}
+        ${row('קרן שנפרעה',fmt(prinPaid,2),'g')}
+        ${row('יתרת משכנתא',fmt(remMort,2),'r')}
+        ${row('עמלת פירעון מוקדם',fmt(prepay,2),'r')}
+      `)}
+      ${card('💰 שכירות אחרי מס',`
+        ${row('הכנסה גולמית ('+holdMo+' חו\')',fmt(totalRent),'g')}
+        ${row('בסיס מס (אחרי '+Math.round(rentDeductPct*100)+'% ניכויים)',fmt(taxableRent,2),'n')}
+        ${row('מס שכירות ('+Math.round(rentTaxRate*100)+'%)',fmt(rentTaxAmt,2),'r')}
+        ${sep()}
+        ${bigRow('שכירות נטו',netRent,'g')}
+      `,'<span class="ok-tag">'+Math.round(rentTaxRate*100)+'% — 2026</span>')}
+      ${card('🚪 רווח הון',`
+        ${row('מחיר מכירה',fmt(exitPrice),'n')}
+        ${row('יתרת משכנתא',fmt(remMort,2),'r')}
+        ${row('עמלת פירעון',fmt(prepay,2),'r')}
+        ${row('הון עצמי',fmt(equity),'r')}
+        ${row('הוצאות עסקה',fmt(txCosts,2),'r')}
+        ${row('רווח הון לפני מס',fmt(capGain,2),cls(capGain))}
+        ${row('מס רווח הון ('+Math.round(cgTaxRate*100)+'%)',fmt(cgTaxAmt,2),'r')}
+        ${sep()}
+        ${bigRow('רווח הון נטו',netCapGain,cls(netCapGain))}
+      `,'<span class="ok-tag">CGT עדכני</span>')}
+    </div>
+
+    <div class="cards-grid">
+      ${card('📊 סיכום רווח כולל',`
+        ${row('רווח הון נטו',fmt(netCapGain,2),cls(netCapGain))}
+        ${row('שכירות נטו',fmt(netRent,2),'g')}
+        ${row('פחות: ריבית',fmt(intTotal,2),'r')}
+        ${sep()}
+        ${bigRow('רווח נקי אחרי מס',netProfit,cls(netProfit))}
+        ${row('בשקלים',fmtILS(netProfit*rate),'gold')}
+        ${row('תשואה על המזומן',pct(retPct,2),cls(retPct))}
+        ${row('IRR שנתי',pct(irr,2),cls(irr))}
+      `,'<span class="ok-tag">✓ כולל מס 2026</span>')}
+      ${card('⚠️ השפעת IMT החדש 2026',`
+        ${row('IMT ב-PDF המקורי (מדרגות ~2.7%)',fmt(oldIMT),'muted')}
+        ${row('IMT 2026 (7.5% קבוע לתושב חוץ)',fmt(newIMT),'r')}
+        ${row('הפרש — עלות נוספת',fmt(imtDiff),'r')}
+        ${sep()}
+        ${row('מס שכירות PDF (25%)',fmt(totalRent*0.75*0.25,0),'muted')}
+        ${row('מס שכירות 2026 ('+Math.round(rentTaxRate*100)+'%)',fmt(rentTaxAmt,0),cls(-rentTaxAmt))}
+        ${row('חיסכון מס שכירות',fmt(totalRent*0.75*0.25-rentTaxAmt,0),'g')}
+        <div style="font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.5;cursor:pointer" onclick="openModal('imt')">
+          → מידע נוסף: <span style="color:var(--blue);text-decoration:underline">מדריך מיסוי מלא</span>
+        </div>
+      `,'<span class="warn-tag">IMT ×2.77</span>')}
+    </div>
+  `;
+}
+
+// ============================================================
+// LONG TERM
+// ============================================================
+function initLtBtns(){
+  const c=q('l_yearBtns');if(!c||c.children.length)return;
+  [1,3,5,10,15,20,25,28].forEach(yr=>{
+    const b=document.createElement('div');b.className='yr-btn'+(yr===5?' active':'');b.textContent='שנה '+yr;
+    b.onclick=()=>{longtermYear=yr;document.querySelectorAll('#l_yearBtns .yr-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');calc('longterm')};
+    c.appendChild(b);
+  });
+}
+function calcLongterm(){
+  initLtBtns();
+  const rate=getRate(), price=parseFloat(q('l_price').value)||0;
+  const eqPct=(parseInt(q('l_eqSlider').value)||30)/100;
+  const intRate=parseFloat(q('l_rate').value)||3, term=parseInt(q('l_term').value)||28;
+  const accomp=parseFloat(q('l_accompEur').value)||0;
+  const rent0=parseFloat(q('l_rent').value)||0, rentGrowth=(parseFloat(q('l_rentGrowth').value)||0)/100;
+  const imiPct=(parseFloat(q('l_imi').value)||0)/100;
+  const txCosts=(parseFloat(q('l_txCosts').value)||0)+accomp;
+  const rentTaxRate=parseFloat(q('l_rentTax').value)||0;
+  const rentDeductPct=(parseFloat(q('l_rentDeduct').value)||0)/100;
+  const yr=longtermYear;
+  const equity=price*eqPct, loan=price-equity, totalCash=equity+txCosts;
+  const yb=yearBreak(loan,intRate,term,yr);
+  const imiAmt=price*imiPct;
+  const rentY=rent0*12*Math.pow(1+rentGrowth,yr-1);
+  const deductY=rentY*rentDeductPct+imiAmt;
+  const taxableY=Math.max(0,rentY-deductY), rentTaxY=taxableY*rentTaxRate;
+  const netRentY=rentY-rentTaxY, cfY=netRentY-yb.interest-yb.principal-imiAmt;
+  const remBal=balAfter(loan,intRate,term,yr*12), equityBuilt=price-remBal;
+  const yieldOnCash=totalCash>0?(netRentY/totalCash)*100:0;
+  const cfYield=totalCash>0?(cfY/totalCash)*100:0;
+  let cumRent=0,cumTax=0,cumOpex=0,cumInt=0,cumPrin=0;
+  for(let y=1;y<=yr;y++){
+    const r=rent0*12*Math.pow(1+rentGrowth,y-1);cumRent+=r;
+    const yby=yearBreak(loan,intRate,term,y);cumInt+=yby.interest;cumPrin+=yby.principal;
+    cumOpex+=imiAmt;
+    const td=Math.max(0,r*rentDeductPct+imiAmt);cumTax+=Math.max(0,r-td)*rentTaxRate;
+  }
+  const cumNetRent=cumRent-cumTax-cumOpex;
+  const cumCF=cumNetRent-cumInt-cumPrin;
+  const years=yr<=10?[...Array(yr).keys()].map(i=>i+1):[1,2,3,5,7,10,...[15,20,25,yr].filter(y=>y>10&&y<=yr)];
+  const uYears=[...new Set(years)].sort((a,b)=>a-b);
+  let tbl=`<table style="width:100%;border-collapse:collapse;font-size:.78rem;font-family:var(--mono)">
+    <tr style="color:var(--muted);font-size:.7rem"><th style="text-align:center;padding:5px">שנה</th><th style="text-align:right;padding:5px">שכ' ברוטו</th><th style="text-align:right;padding:5px;color:var(--red)">מס</th><th style="text-align:right;padding:5px;color:var(--red)">ריבית</th><th style="text-align:right;padding:5px">קרן</th><th style="text-align:right;padding:5px;color:var(--green)">CF נטו</th></tr>`;
+  uYears.forEach(y=>{
+    const r=rent0*12*Math.pow(1+rentGrowth,y-1);
+    const ybr=yearBreak(loan,intRate,term,y);
+    const td=Math.max(0,r*rentDeductPct+imiAmt);
+    const rt=Math.max(0,r-td)*rentTaxRate;
+    const cf=r-rt-ybr.interest-ybr.principal-imiAmt;
+    const hi=y===yr;
+    tbl+=`<tr style="background:${hi?'rgba(201,168,76,.08)':'transparent'};border-top:1px solid var(--border)">
+      <td style="text-align:center;padding:5px;${hi?'color:var(--gold);font-weight:700':'color:var(--muted)'}">${y}</td>
+      <td style="text-align:right;padding:5px">${Math.round(r).toLocaleString()}</td>
+      <td style="text-align:right;padding:5px;color:var(--red)">${Math.round(rt).toLocaleString()}</td>
+      <td style="text-align:right;padding:5px;color:var(--red)">${Math.round(ybr.interest).toLocaleString()}</td>
+      <td style="text-align:right;padding:5px;color:var(--muted)">${Math.round(ybr.principal).toLocaleString()}</td>
+      <td style="text-align:right;padding:5px;color:${cf>=0?'var(--green)':'var(--red)'}"><strong>${Math.round(cf).toLocaleString()}</strong></td>
+    </tr>`;
+  });
+  tbl+='</table>';
+
+  q('longterm-results').innerHTML=`
+    <div class="kpi-bar">
+      ${kpi('תשואה שנה '+yr,pct(yieldOnCash,1),cls(yieldOnCash),'על מזומן')}
+      ${kpi('CF שנה '+yr,fmt(cfY,0),cls(cfY),fmtILS(cfY*rate))}
+      ${kpi('הון עצמי בנכס',fmt(equityBuilt,0),'blue','שנה '+yr)}
+      ${kpi('מזומן שהושקע',fmt(totalCash,0),'gold',fmtILS(totalCash*rate))}
+    </div>
+    <div class="info-box-green" style="cursor:pointer" onclick="openModal('rental')">
+      ✓ <strong>מס שכירות 2026: ${Math.round(rentTaxRate*100)}%</strong> (Law 9-A/2026 — ירידה מ-25%)
+      &nbsp;<span style="font-size:.75rem;text-decoration:underline">→ פרטים</span>
+    </div>
+    <div class="cards-grid">
+      ${card('📅 שנה '+yr+' — פירוט',`
+        ${row('שכירות גולמית',fmt(rentY,2),'g')}
+        ${row('ניכויים ('+Math.round(rentDeductPct*100)+'% + IMI)',fmt(deductY,2),'muted')}
+        ${row('מס שכירות ('+Math.round(rentTaxRate*100)+'%)',fmt(rentTaxY,2),'r')}
+        ${row('שכירות נטו',fmt(netRentY,2),'g')}
+        ${sep()}
+        ${row('ריבית שנה '+yr,fmt(yb.interest,2),'r')}
+        ${row('קרן שנה '+yr,fmt(yb.principal,2),'muted')}
+        ${row('IMI',fmt(imiAmt,2),'r')}
+        ${sep()}
+        ${bigRow('Cash Flow נטו שנה '+yr,cfY,cls(cfY))}
+        ${row('תשואה על מזומן',pct(yieldOnCash,2),cls(yieldOnCash))}
+        ${row('תשואת CF',pct(cfYield,2),cls(cfYield))}
+      `)}
+      ${card('📈 מצטבר עד שנה '+yr,`
+        ${row('שכירות גולמית מצטברת',fmt(cumRent,2),'g')}
+        ${row('מס מצטבר',fmt(cumTax,2),'r')}
+        ${row('שכירות נטו מצטברת',fmt(cumNetRent,2),'g')}
+        ${sep()}
+        ${row('ריבית מצטברת',fmt(cumInt,2),'r')}
+        ${row('קרן (חיסכון)',fmt(cumPrin,2),'blue')}
+        ${row('IMI מצטבר',fmt(cumOpex,2),'r')}
+        ${sep()}
+        ${bigRow('Cash Flow מצטבר',cumCF,cls(cumCF))}
+        ${row('יתרת משכנתא',fmt(remBal,2),'muted')}
+        ${row('הון עצמי בנכס',fmt(equityBuilt,0),'blue')}
+      `)}
+    </div>
+    <div class="rcard"><div class="rcard-head">📊 טבלת שנים</div><div class="rcard-body">${tbl}</div></div>
+  `;
+}
+
+// ============================================================
+// AIRBNB
+// ============================================================
+function calcAirbnb(){
+  const rate=getRate(), price=parseFloat(q('a_price').value)||0;
+  const eqPct=(parseInt(q('a_eqSlider').value)||30)/100;
+  const intRate=parseFloat(q('a_rate').value)||3, term=parseInt(q('a_term').value)||28;
+  const accomp=parseFloat(q('a_accompEur').value)||0;
+  const nightRate=parseFloat(q('a_night').value)||0;
+  const occPct=(parseInt(q('a_occSlider').value)||70)/100;
+  const mgmtPct=(parseFloat(q('a_mgmt').value)||0)/100;
+  const platPct=(parseFloat(q('a_platform').value)||3)/100;
+  const cleanFee=parseFloat(q('a_clean').value)||0;
+  const avgStay=parseFloat(q('a_avgStay').value)||4;
+  const maint=parseFloat(q('a_maint').value)||0;
+  const miscC=parseFloat(q('a_misc').value)||0;
+  const imiPct=(parseFloat(q('a_imi').value)||0)/100;
+  const txCosts=(parseFloat(q('a_txCosts').value)||0)+accomp;
+  const equity=price*eqPct, loan=price-equity, totalCash=equity+txCosts;
+  const mm=mortMonthly(loan,intRate,term);
+  const nights=365*occPct, gross=nights*nightRate;
+  const numStays=nights/avgStay;
+  const cleaning=numStays*cleanFee, platFee=gross*platPct, mgmtFee=gross*mgmtPct;
+  const imiAmt=price*imiPct;
+  const totalOpex=cleaning+platFee+mgmtFee+maint+miscC+imiAmt;
+  const netBefTax=gross-totalOpex;
+  // AL tax: above threshold 27360 → coefficient 50%, else 35%
+  const coeff=gross>27360?0.50:0.35;
+  const alTaxBase=gross*coeff, alTax=alTaxBase*0.25;
+  const netAftTax=netBefTax-alTax;
+  const y1=yearBreak(loan,intRate,term,1);
+  const cfY=netAftTax-y1.interest-y1.principal;
+  const yieldOC=totalCash>0?(netAftTax/totalCash)*100:0;
+  const cfYield=totalCash>0?(cfY/totalCash)*100:0;
+  const effRate=gross>0?(alTax/gross)*100:0;
+  const overThresh=gross>27360;
+  // show/hide warning
+  const wEl=q('a_alWarn');if(wEl)wEl.style.display=overThresh?'block':'none';
+
+  q('airbnb-results').innerHTML=`
+    <div class="kpi-bar">
+      ${kpi('לילות/שנה',Math.round(nights)+'','blue',`תפוסה ${Math.round(occPct*100)}%`)}
+      ${kpi('הכנסה גולמית',fmt(gross,0),'g',fmtILS(gross*rate))}
+      ${kpi('תשואה על מזומן',pct(yieldOC,1),cls(yieldOC),'אחרי מס')}
+      ${kpi('CF שנתי נטו',fmt(cfY,0),cls(cfY),fmtILS(cfY*rate))}
+    </div>
+    ${overThresh?`<div class="warn-box">⚠ <strong>הכנסה מעל €27,360</strong> — מקדם עולה ל-50% → מס אפקטיבי <strong>12.5%</strong> (במקום 8.75%). לחץ <span style="cursor:pointer;color:var(--blue);text-decoration:underline" onclick="openModal('airbnb')">כאן</span> לפרטים.</div>`:''}
+    <div class="cards-grid">
+      ${card('🏨 הכנסות Airbnb',`
+        ${row('מחיר לילה',fmt(nightRate),'n')}
+        ${row('לילות ('+Math.round(occPct*100)+'%)',Math.round(nights)+'')}
+        ${row('הכנסה גולמית',fmt(gross,2),'g')}
+        ${row('הכנסה חודשית',fmt(gross/12,2),'g')}
+        ${row('שווי ₪',fmtILS(gross*rate),'gold')}
+      `)}
+      ${card('💸 הוצאות תפעול',`
+        ${row('ניהול ('+Math.round(mgmtPct*100)+'%)',fmt(mgmtFee,2),'r')}
+        ${row('Airbnb ('+Math.round(platPct*100)+'%)',fmt(platFee,2),'r')}
+        ${row('ניקיון',fmt(cleaning,2),'r')}
+        ${row('תחזוקה',fmt(maint,2),'r')}
+        ${row('ביטוח + VAT + תיירות',fmt(miscC,2),'r')}
+        ${row('IMI',fmt(imiAmt,2),'r')}
+        ${sep()}
+        ${bigRow('סה"כ הוצאות',totalOpex,'r',false)}
+        ${row('הכנסה לפני מס',fmt(netBefTax,2),cls(netBefTax))}
+      `)}
+      ${card('🧾 מס AL פורטוגל 2026',`
+        ${row('הכנסה גולמית',fmt(gross,2),'g')}
+        ${row('מקדם ('+Math.round(coeff*100)+'%'+(overThresh?' — מעל תקרה':'')+' )',fmt(alTaxBase,2),'n')}
+        ${row('מס 25% על הבסיס',fmt(alTax,2),'r')}
+        ${row('שיעור אפקטיבי',pct(effRate,2),overThresh?'r':'g')}
+        ${sep()}
+        ${bigRow('הכנסה נטו',netAftTax,cls(netAftTax))}
+      `,'<span class="'+(overThresh?'warn-tag':'ok-tag')+'">'+(overThresh?'12.5% ⚠':'8.75% ✓')+'</span>')}
+      ${card('📊 Cash Flow',`
+        ${row('הכנסה נטו',fmt(netAftTax,2),'g')}
+        ${row('ריבית שנה 1',fmt(y1.interest,2),'r')}
+        ${row('קרן שנה 1',fmt(y1.principal,2),'muted')}
+        ${sep()}
+        ${bigRow('CF שנתי נטו',cfY,cls(cfY))}
+        ${row('CF חודשי',fmt(cfY/12,2),cls(cfY))}
+        ${row('תשואה על מזומן',pct(yieldOC,2),cls(yieldOC))}
+        ${row('תשואת CF',pct(cfYield,2),cls(cfYield))}
+        ${row('מזומן',fmt(totalCash,0)+' / '+fmtILS(totalCash*rate),'gold')}
+      `)}
+    </div>
+    <div class="info-box-blue" style="cursor:pointer" onclick="openModal('airbnb')">
+      📋 AL (Alojamento Local) 2026: מס 8.75% אפקטיבי עד €27,360/שנה | 12.5% מעל זה | רישיון AL מועצה מקומית נדרש.
+      <span style="text-decoration:underline;margin-right:8px">→ מדריך מלא</span>
+    </div>
+  `;
+}
+
+// ============================================================
+// NO LOAN
+// ============================================================
+function calcNoloan(){
+  const rate=getRate(), price=parseFloat(q('n_price').value)||0;
+  const accomp=parseFloat(q('n_accompEur').value)||0;
+  const rent0=parseFloat(q('n_rent').value)||0, rentGrowth=(parseFloat(q('n_rentGrowth').value)||0)/100;
+  const imiPct=(parseFloat(q('n_imi').value)||0)/100, maint=parseFloat(q('n_maint').value)||0;
+  const txCosts=['n_imt','n_stamp','n_other'].reduce((s,id)=>s+(parseFloat(q(id).value)||0),0)+accomp;
+  const rentTaxRate=parseFloat(q('n_rentTax').value)||0;
+  const rentDeductPct=(parseFloat(q('n_rentDeduct').value)||0)/100;
+  const cgTaxRate=parseFloat(q('n_cgTax').value)||0;
+  const exitPrice=parseFloat(q('n_exit').value)||0, holdYears=parseInt(q('n_holdYears').value)||5;
+  const totalCash=price+txCosts, imiAmt=price*imiPct;
+  const rentY1=rent0*12, deductY1=rentY1*rentDeductPct+imiAmt+maint;
+  const taxableY1=Math.max(0,rentY1-deductY1), taxY1=taxableY1*rentTaxRate;
+  const netRentY1=rentY1-taxY1-imiAmt-maint;
+  const yieldY1=totalCash>0?(netRentY1/totalCash)*100:0;
+  const grossYield=totalCash>0?(rentY1/totalCash)*100:0;
+  let cumRent=0,cumTax=0,cumOpex=0;
+  for(let y=1;y<=holdYears;y++){
+    const r=rent0*12*Math.pow(1+rentGrowth,y-1);cumRent+=r;
+    const d=Math.max(0,r*rentDeductPct+imiAmt+maint);cumTax+=Math.max(0,r-d)*rentTaxRate;cumOpex+=imiAmt+maint;
+  }
+  const cumNetRent=cumRent-cumTax-cumOpex;
+  const capGain=exitPrice-price-txCosts, cgTaxAmt=Math.max(0,capGain)*cgTaxRate;
+  const netCapGain=capGain-cgTaxAmt, totalReturn=cumNetRent+netCapGain;
+  const totalRetPct=totalCash>0?(totalReturn/totalCash)*100:0;
+
+  q('noloan-results').innerHTML=`
+    <div class="kpi-bar">
+      ${kpi('תשואה גולמית שנה 1',pct(grossYield,2),'blue','Gross Yield')}
+      ${kpi('תשואה נטו שנה 1',pct(yieldY1,2),cls(yieldY1),'אחרי מס+הוצ\'')}
+      ${kpi('רווח כולל ('+holdYears+' שנים)',fmt(totalReturn,0),cls(totalReturn),fmtILS(totalReturn*rate))}
+      ${kpi('ללא מינוף','100%','gold','רכישה מלאה')}
+    </div>
+    <div class="info-box-green" style="cursor:pointer" onclick="openModal('rental')">
+      ✓ <strong>מס שכירות ${Math.round(rentTaxRate*100)}%</strong> לפי Law 9-A/2026
+      &nbsp;<span style="font-size:.75rem;text-decoration:underline">→ פרטים</span>
+    </div>
+    <div class="cards-grid">
+      ${card('💰 מבנה ההשקעה',`
+        ${row('מחיר הדירה',fmt(price),'n')}
+        ${row('הוצאות עסקה (IMT 7.5%)',fmt(txCosts,2),'r')}
+        ${accomp>0?row('מתוכן: ליווי',fmt(accomp)+' / '+fmtILS(accomp*rate),'r'):''}
+        ${sep()}
+        ${bigRow('סה"כ מזומן',totalCash,'gold')}
+        ${row('שווי ₪',fmtILS(totalCash*rate),'muted')}
+      `)}
+      ${card('🏠 שנה 1 — שכירות',`
+        ${row('שכירות גולמית',fmt(rentY1,2),'g')}
+        ${row('ניכויים',fmt(deductY1,2),'muted')}
+        ${row('מס ('+Math.round(rentTaxRate*100)+'%)',fmt(taxY1,2),'r')}
+        ${row('IMI + תחזוקה',fmt(imiAmt+maint,2),'r')}
+        ${sep()}
+        ${bigRow('הכנסה נטו שנה 1',netRentY1,cls(netRentY1))}
+        ${row('תשואה נטו',pct(yieldY1,2),cls(yieldY1))}
+        ${row('תשואה גולמית',pct(grossYield,2),'blue')}
+      `)}
+      ${card('📈 מצטבר '+holdYears+' שנים',`
+        ${row('שכירות גולמית',fmt(cumRent,2),'g')}
+        ${row('מס מצטבר',fmt(cumTax,2),'r')}
+        ${row('הוצאות תפעול',fmt(cumOpex,2),'r')}
+        ${sep()}
+        ${bigRow('שכירות נטו מצטברת',cumNetRent,cls(cumNetRent))}
+      `)}
+      ${exitPrice>0?card('🚪 EXIT ('+holdYears+' שנים)',`
+        ${row('מחיר מכירה',fmt(exitPrice),'n')}
+        ${row('עלות (רכישה + הוצאות)',fmt(totalCash,2),'r')}
+        ${row('רווח הון לפני מס',fmt(capGain,2),cls(capGain))}
+        ${row('מס CGT (~'+Math.round(cgTaxRate*100)+'%)',fmt(cgTaxAmt,2),'r')}
+        ${sep()}
+        ${bigRow('רווח הון נטו',netCapGain,cls(netCapGain))}
+        ${bigRow('תשואה כוללת',totalReturn,cls(totalReturn))}
+        ${row('תשואה על מזומן',pct(totalRetPct,2),cls(totalRetPct))}
+      `):''}
+    </div>
+  `;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+calcExit();
+</script>
+</body>
+</html>
