@@ -222,6 +222,38 @@ a.score-pill-cell:hover{{background:linear-gradient(135deg,rgba(228,184,100,.28)
 .src-badge{{display:inline-block;background:var(--bg-2);border:1px solid var(--line);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-1);letter-spacing:.3px;text-decoration:none;transition:all .15s;cursor:pointer}}
 a.src-badge:hover{{background:var(--accent-azulejo);color:var(--bg-0);border-color:var(--accent-azulejo)}}
 .empty{{text-align:center;padding:40px;color:var(--text-3);font-style:italic}}
+/* --- Control Panel --- */
+.control-bar{{display:flex;align-items:center;gap:12px;padding:14px 18px;margin-bottom:18px;
+  background:linear-gradient(135deg,rgba(228,184,100,.08),rgba(58,127,193,.06));
+  border:1px solid var(--line-soft);border-radius:12px}}
+.ctl-btn{{background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-b));color:var(--bg-0);
+  border:none;padding:10px 22px;border-radius:9px;font-family:var(--sans);font-size:14px;font-weight:800;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;box-shadow:0 4px 14px -4px rgba(228,184,100,.5)}}
+.ctl-btn:hover:not(:disabled){{transform:translateY(-1px);box-shadow:0 6px 18px -4px rgba(228,184,100,.7)}}
+.ctl-btn:disabled{{opacity:.5;cursor:wait}}
+.ctl-btn-sec{{background:transparent;border:1px solid var(--line);color:var(--text-1);padding:10px 18px;
+  border-radius:9px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}}
+.ctl-btn-sec:hover{{border-color:var(--accent-gold);color:var(--accent-gold-b)}}
+.ctl-status{{margin-inline-start:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-2)}}
+.ctl-dot{{width:10px;height:10px;border-radius:50%;background:var(--text-3)}}
+.ctl-dot.online{{background:#5cc69a;box-shadow:0 0 8px rgba(92,198,154,.6)}}
+.ctl-dot.running{{background:#5ba0e3;animation:pulse 1.5s infinite}}
+.ctl-dot.offline{{background:#ef4b5c}}
+@keyframes pulse{{0%,100%{{opacity:1}}50%{{opacity:.4}}}}
+.ctl-schedule{{color:var(--accent-gold-b);font-weight:700;font-family:var(--mono)}}
+/* --- Modal --- */
+.modal-bg{{position:fixed;inset:0;background:rgba(8,12,24,.85);backdrop-filter:blur(6px);z-index:100;
+  display:none;align-items:center;justify-content:center}}
+.modal-bg.open{{display:flex}}
+.modal{{background:var(--bg-1);border:1px solid var(--line);border-radius:14px;padding:30px;max-width:420px;width:90%;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}}
+.modal h3{{font-family:var(--serif-he);font-size:22px;font-weight:700;margin-bottom:8px}}
+.modal p{{color:var(--text-1);font-size:13px;margin-bottom:18px}}
+.modal .hour-input{{display:flex;align-items:center;gap:10px;margin-bottom:20px}}
+.modal input[type=number]{{background:var(--bg-2);border:1px solid var(--line);color:var(--text-0);
+  padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:20px;font-weight:700;width:80px;direction:ltr;text-align:center}}
+.modal input[type=number]:focus{{outline:none;border-color:var(--accent-gold)}}
+.modal-actions{{display:flex;gap:10px;justify-content:flex-end}}
 .pager{{display:flex;justify-content:center;gap:6px;padding:18px;border-top:1px solid var(--line-soft);background:var(--bg-2)}}
 .pager button{{background:transparent;border:1px solid var(--line);color:var(--text-1);padding:6px 12px;border-radius:6px;font-family:var(--mono);font-size:12px;cursor:pointer}}
 .pager button.active{{background:var(--accent-gold);color:var(--bg-0);border-color:var(--accent-gold)}}
@@ -260,6 +292,21 @@ footer.bot span{{color:var(--accent-azulejo)}}
     <div class="stat"><div class="k">נותחו בעומק</div><div class="v">{meta['scored']}</div></div>
     <div class="stat"><div class="k">מקורות פעילים</div><div class="v">{len([k for k in SOURCE_LABELS if k])}</div></div>
     <div class="stat"><div class="k">Freguesias</div><div class="v">{len(FREGUESIAS)}</div></div>
+  </div>
+
+  <div class="control-bar">
+    <button class="ctl-btn" id="btn-scan" onclick="startScan()">
+      <span id="btn-scan-icon">🔄</span>
+      <span id="btn-scan-label">התחל סריקה עכשיו</span>
+    </button>
+    <button class="ctl-btn-sec" onclick="openScheduleModal()">
+      ⏰ <span>תזמון לילי</span>
+    </button>
+    <div class="ctl-status">
+      <span class="ctl-dot" id="srv-dot"></span>
+      <span id="srv-label">בודק שרת...</span>
+      <span id="srv-schedule"></span>
+    </div>
   </div>
 
   <div class="tabs">
@@ -477,7 +524,129 @@ document.querySelectorAll('[data-score]').forEach(p => {{
 }});
 
 render();
+
+/* ============================ */
+/*  CONTROL SERVER INTEGRATION  */
+/* ============================ */
+const SERVER = 'http://127.0.0.1:5055';
+
+async function pollStatus() {{
+  const dot = document.getElementById('srv-dot');
+  const lbl = document.getElementById('srv-label');
+  const sched = document.getElementById('srv-schedule');
+  const btnScan = document.getElementById('btn-scan');
+  const btnScanLabel = document.getElementById('btn-scan-label');
+  const btnScanIcon = document.getElementById('btn-scan-icon');
+  try {{
+    const r = await fetch(SERVER + '/api/status', {{cache: 'no-store'}});
+    if (!r.ok) throw new Error('bad');
+    const s = await r.json();
+    if (s.running) {{
+      dot.className = 'ctl-dot running';
+      lbl.textContent = 'סריקה פעילה...';
+      btnScan.disabled = true;
+      btnScanIcon.textContent = '⏳';
+      btnScanLabel.textContent = 'סריקה פעילה';
+    }} else {{
+      dot.className = 'ctl-dot online';
+      btnScan.disabled = false;
+      btnScanIcon.textContent = '🔄';
+      btnScanLabel.textContent = 'התחל סריקה עכשיו';
+      if (s.last_scan) {{
+        const ago = s.last_scan_ago_s || 0;
+        const agoTxt = ago < 60 ? `${{ago}}ש׳` : ago < 3600 ? `${{Math.floor(ago/60)}}ד׳` : `${{Math.floor(ago/3600)}}ש״`;
+        lbl.textContent = `שרת פעיל · סריקה אחרונה לפני ${{agoTxt}}${{s.last_count ? ` (${{s.last_count}} חדשים)` : ''}}`;
+      }} else {{
+        lbl.textContent = 'שרת פעיל · אין סריקה עדיין';
+      }}
+    }}
+    sched.textContent = s.schedule_hour != null ? `· ⏰ ${{String(s.schedule_hour).padStart(2,'0')}}:00` : '';
+  }} catch (e) {{
+    dot.className = 'ctl-dot offline';
+    lbl.innerHTML = 'שרת כבוי · <a href="#" onclick="showServerHelp();return false" style="color:var(--accent-gold-b);text-decoration:underline">כיצד להפעיל?</a>';
+    sched.textContent = '';
+    btnScan.disabled = true;
+  }}
+}}
+
+async function startScan() {{
+  try {{
+    const r = await fetch(SERVER + '/api/scan/start', {{method: 'POST', headers: {{'Content-Type':'application/json'}}, body: '{{"pages":3}}'}});
+    const d = await r.json();
+    if (r.ok) {{
+      alert('✅ סריקה החלה — לחץ "רענן" בעוד 5 דקות לראות תוצאות.');
+      pollStatus();
+    }} else {{
+      alert('שגיאה: ' + (d.error || 'unknown'));
+    }}
+  }} catch (e) {{
+    alert('לא הצלחתי להתחבר לשרת. ודא שהוא רץ (הרץ server/start_server.bat)');
+  }}
+}}
+
+function showServerHelp() {{
+  alert('כדי להפעיל את הסריקה מהדשבורד:\\n\\n' +
+        '1. פתח את C:\\\\Users\\\\user\\\\porto-pessoa\\\\server\\\\\\n' +
+        '2. הרץ start_server.bat (קליק כפול)\\n' +
+        '3. רענן את הדף');
+}}
+
+function openScheduleModal() {{
+  document.getElementById('schedule-modal').classList.add('open');
+}}
+function closeScheduleModal() {{
+  document.getElementById('schedule-modal').classList.remove('open');
+}}
+
+async function saveSchedule() {{
+  const hour = parseInt(document.getElementById('sched-hour').value || '3');
+  try {{
+    const r = await fetch(SERVER + '/api/schedule', {{
+      method: 'POST', headers: {{'Content-Type': 'application/json'}},
+      body: JSON.stringify({{hour}}),
+    }});
+    const d = await r.json();
+    if (r.ok) {{
+      closeScheduleModal();
+      alert(`✅ תזמון יומי נקבע ל-${{String(hour).padStart(2,'0')}}:00`);
+      pollStatus();
+    }} else {{
+      alert('שגיאה: ' + (d.error || 'unknown'));
+    }}
+  }} catch (e) {{
+    alert('שרת לא זמין');
+  }}
+}}
+
+async function removeSchedule() {{
+  if (!confirm('להסיר תזמון יומי?')) return;
+  try {{
+    const r = await fetch(SERVER + '/api/schedule', {{method: 'DELETE'}});
+    closeScheduleModal();
+    pollStatus();
+  }} catch (e) {{ alert('שרת לא זמין'); }}
+}}
+
+pollStatus();
+setInterval(pollStatus, 5000);
 </script>
+<!-- Schedule Modal -->
+<div class="modal-bg" id="schedule-modal" onclick="if(event.target===this)closeScheduleModal()">
+  <div class="modal">
+    <h3>⏰ תזמון סריקה לילית</h3>
+    <p>באיזה שעה לילית להריץ את הסריקה האוטומטית? (0-23 שעון מקומי)</p>
+    <div class="hour-input">
+      <label>שעה:</label>
+      <input type="number" id="sched-hour" min="0" max="23" value="3">
+      <span>:00</span>
+    </div>
+    <div class="modal-actions">
+      <button class="ctl-btn-sec" onclick="removeSchedule()">הסרה</button>
+      <button class="ctl-btn-sec" onclick="closeScheduleModal()">ביטול</button>
+      <button class="ctl-btn" onclick="saveSchedule()">שמור</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>"""
 
