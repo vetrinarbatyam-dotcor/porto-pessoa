@@ -17,6 +17,7 @@ from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import DB_PATH, DASH_OUT, FREGUESIAS
+from dashboard.render_settings import _render_settings
 
 DASH_OUT.mkdir(parents=True, exist_ok=True)
 ASSETS_DIR = Path(__file__).parent / "assets"
@@ -25,10 +26,12 @@ SOURCE_LABELS = {
     "idealista": "Idealista", "imovirtual": "Imovirtual",
     "casa_sapo": "Casa Sapo", "supercasa": "Supercasa",
     "custojusto": "Custojusto",
+    "invest_porto": "Invest Porto",
 }
 SOURCE_URL_PREFIX = {
     "idealista": "Idealista",  "imovirtual": "Imov.",
     "casa_sapo": "Sapo", "supercasa": "SuperC.", "custojusto": "CJ",
+    "invest_porto": "InvPO",
 }
 
 
@@ -41,6 +44,27 @@ def _conn():
 def _all_properties() -> list[dict]:
     with _conn() as db:
         rows = db.execute("SELECT * FROM v_top_properties ORDER BY id DESC").fetchall()
+        listings_by_prop = {}
+        for r in db.execute("SELECT property_id, source, url, asking_price FROM listings"):
+            listings_by_prop.setdefault(r["property_id"], []).append(dict(r))
+    out = []
+    for r in rows:
+        d = dict(r)
+        d["listings"] = listings_by_prop.get(d["id"], [])
+        out.append(d)
+    return out
+
+
+
+def _invest_porto_properties() -> list[dict]:
+    """All properties from invest_porto source with their listings."""
+    with _conn() as db:
+        rows = db.execute(
+            """SELECT DISTINCT p.* FROM v_top_properties p
+               JOIN listings l ON l.property_id = p.id
+               WHERE l.source = 'invest_porto'
+               ORDER BY p.composite DESC NULLS LAST, p.price_eur ASC"""
+        ).fetchall()
         listings_by_prop = {}
         for r in db.execute("SELECT property_id, source, url, asking_price FROM listings"):
             listings_by_prop.setdefault(r["property_id"], []).append(dict(r))
@@ -99,12 +123,15 @@ def _row_data(p: dict) -> dict:
         "sources": sources,
         "source_count": len(sources),
         "url_first": listings[0]["url"] if listings else "",
+        "first_seen": p.get("first_seen") or "",
+        "sources_csv": p.get("sources_csv") or "",
     }
 
 
-def _render_index(all_props: list[dict], by_score: dict[str, list[dict]], meta: dict) -> str:
+def _render_index(all_props: list[dict], by_score: dict[str, list[dict]], meta: dict, invest_porto_props: list[dict] | None = None) -> str:
     all_data = [_row_data(p) for p in all_props]
     score_data = {k: [_row_data(p) for p in v] for k, v in by_score.items()}
+    ip_data = [_row_data(p) for p in (invest_porto_props or [])]
 
     last_scan = meta["last_scan"].get("finished_at", "—")
     typ_counts = meta["by_typology"]
@@ -117,6 +144,11 @@ def _render_index(all_props: list[dict], by_score: dict[str, list[dict]], meta: 
         '<button class="pill score-pill" data-score="none">ללא ציון <small>' + str(meta["total"] - meta["scored"]) + '</small></button>'
     )
 
+    all_freguesias = sorted(set(p.get("freguesia") or "" for p in all_props if p.get("freguesia")))
+    freq_options = "\n".join(
+        f'<option value="{fr}">{fr}</option>' for fr in all_freguesias
+    )
+
     # Embed JSON datasets in <script> for client-side rendering
     data_json = json.dumps({
         "all": all_data,
@@ -126,6 +158,7 @@ def _render_index(all_props: list[dict], by_score: dict[str, list[dict]], meta: 
         "score_c": score_data.get("score_c", []),
         "score_d": score_data.get("score_d", []),
         "score_e": score_data.get("score_e", []),
+        "invest_porto": ip_data,
     }, ensure_ascii=False)
 
     return f"""<!doctype html>
@@ -222,38 +255,6 @@ a.score-pill-cell:hover{{background:linear-gradient(135deg,rgba(228,184,100,.28)
 .src-badge{{display:inline-block;background:var(--bg-2);border:1px solid var(--line);padding:2px 7px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--text-1);letter-spacing:.3px;text-decoration:none;transition:all .15s;cursor:pointer}}
 a.src-badge:hover{{background:var(--accent-azulejo);color:var(--bg-0);border-color:var(--accent-azulejo)}}
 .empty{{text-align:center;padding:40px;color:var(--text-3);font-style:italic}}
-/* --- Control Panel --- */
-.control-bar{{display:flex;align-items:center;gap:12px;padding:14px 18px;margin-bottom:18px;
-  background:linear-gradient(135deg,rgba(228,184,100,.08),rgba(58,127,193,.06));
-  border:1px solid var(--line-soft);border-radius:12px}}
-.ctl-btn{{background:linear-gradient(135deg,var(--accent-gold),var(--accent-gold-b));color:var(--bg-0);
-  border:none;padding:10px 22px;border-radius:9px;font-family:var(--sans);font-size:14px;font-weight:800;
-  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;box-shadow:0 4px 14px -4px rgba(228,184,100,.5)}}
-.ctl-btn:hover:not(:disabled){{transform:translateY(-1px);box-shadow:0 6px 18px -4px rgba(228,184,100,.7)}}
-.ctl-btn:disabled{{opacity:.5;cursor:wait}}
-.ctl-btn-sec{{background:transparent;border:1px solid var(--line);color:var(--text-1);padding:10px 18px;
-  border-radius:9px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}}
-.ctl-btn-sec:hover{{border-color:var(--accent-gold);color:var(--accent-gold-b)}}
-.ctl-status{{margin-inline-start:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-2)}}
-.ctl-dot{{width:10px;height:10px;border-radius:50%;background:var(--text-3)}}
-.ctl-dot.online{{background:#5cc69a;box-shadow:0 0 8px rgba(92,198,154,.6)}}
-.ctl-dot.running{{background:#5ba0e3;animation:pulse 1.5s infinite}}
-.ctl-dot.offline{{background:#ef4b5c}}
-@keyframes pulse{{0%,100%{{opacity:1}}50%{{opacity:.4}}}}
-.ctl-schedule{{color:var(--accent-gold-b);font-weight:700;font-family:var(--mono)}}
-/* --- Modal --- */
-.modal-bg{{position:fixed;inset:0;background:rgba(8,12,24,.85);backdrop-filter:blur(6px);z-index:100;
-  display:none;align-items:center;justify-content:center}}
-.modal-bg.open{{display:flex}}
-.modal{{background:var(--bg-1);border:1px solid var(--line);border-radius:14px;padding:30px;max-width:420px;width:90%;
-  box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}}
-.modal h3{{font-family:var(--serif-he);font-size:22px;font-weight:700;margin-bottom:8px}}
-.modal p{{color:var(--text-1);font-size:13px;margin-bottom:18px}}
-.modal .hour-input{{display:flex;align-items:center;gap:10px;margin-bottom:20px}}
-.modal input[type=number]{{background:var(--bg-2);border:1px solid var(--line);color:var(--text-0);
-  padding:10px 14px;border-radius:8px;font-family:var(--mono);font-size:20px;font-weight:700;width:80px;direction:ltr;text-align:center}}
-.modal input[type=number]:focus{{outline:none;border-color:var(--accent-gold)}}
-.modal-actions{{display:flex;gap:10px;justify-content:flex-end}}
 .pager{{display:flex;justify-content:center;gap:6px;padding:18px;border-top:1px solid var(--line-soft);background:var(--bg-2)}}
 .pager button{{background:transparent;border:1px solid var(--line);color:var(--text-1);padding:6px 12px;border-radius:6px;font-family:var(--mono);font-size:12px;cursor:pointer}}
 .pager button.active{{background:var(--accent-gold);color:var(--bg-0);border-color:var(--accent-gold)}}
@@ -261,6 +262,15 @@ a.src-badge:hover{{background:var(--accent-azulejo);color:var(--bg-0);border-col
 .pager .info{{color:var(--text-2);font-size:12px;padding:6px 10px}}
 footer.bot{{border-top:1px solid var(--line-soft);padding:28px 0;margin-top:50px;text-align:center;font-size:11px;color:var(--text-3);font-family:var(--mono);letter-spacing:1.5px}}
 footer.bot span{{color:var(--accent-azulejo)}}
+.new-badge{{display:inline-block;background:var(--accent-gold);color:#080c18;font-size:9px;font-weight:800;padding:1px 5px;border-radius:3px;letter-spacing:.8px;vertical-align:middle;margin-inline-start:5px}}
+.strong-buy-row{{background:rgba(228,184,100,.07)!important;box-shadow:inset 3px 0 0 var(--accent-gold)}}
+.strong-buy-row:hover{{background:rgba(228,184,100,.13)!important}}
+.investigate-btn{{background:none;border:1px solid rgba(96,165,250,.3);color:#60a5fa;cursor:pointer;border-radius:5px;padding:2px 7px;font-size:11px;transition:all .2s}}
+.investigate-btn:hover{{background:#1e3a5f;border-color:#60a5fa}}
+#inv-overlay{{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;overflow-y:auto}}
+#inv-modal{{background:#0d1117;border:1px solid #2a3045;border-radius:14px;max-width:900px;margin:24px auto;padding:0;position:relative;min-height:200px}}
+#inv-close{{position:sticky;top:12px;float:right;margin:12px 16px 0 0;background:#1e293b;border:1px solid #374151;color:#94a3b8;cursor:pointer;border-radius:6px;padding:6px 14px;font-size:13px;z-index:10}}
+#inv-loading{{text-align:center;padding:80px 20px;color:#60a5fa;font-size:16px}}
 </style>
 </head>
 <body>
@@ -271,6 +281,10 @@ footer.bot span{{color:var(--accent-azulejo)}}
       <div><div class="brand-name">PESSOA · פורטו מרכז</div><div class="brand-sub">FAROL Scanner + PESSOA Deep · On-demand</div></div>
     </div>
     <div class="meta">
+      <a class="calc-btn" href="settings.html" title="הגדרות · PESSOA Configuration" style="border-color:rgba(130,140,180,.4);color:#8899cc;">
+        <div class="calc-icon" style="background:linear-gradient(135deg,#3a4a7a,#5a6aaa);">⚙</div>
+        <div class="calc-label"><strong style="color:#aabbee;">הגדרות</strong><small>PESSOA Config</small></div>
+      </a>
       <a class="calc-btn" href="investment-calculator.html" target="_blank" title="מחשבון השקעה · Investment Calculator">
         <span class="calc-icon">₪</span>
         <div class="calc-label">
@@ -278,7 +292,7 @@ footer.bot span{{color:var(--accent-azulejo)}}
           <small>Investment Calculator</small>
         </div>
       </a>
-      <span>סריקה אחרונה <strong>{html.escape(last_scan)}</strong></span>
+      <span>סריקה אחרונה <strong>{html.escape(last_scan or "-")}</strong></span>
       <span>ב-DB <strong>{meta['total']}</strong></span>
       <span>נותחו <strong>{meta['scored']}</strong></span>
     </div>
@@ -294,21 +308,6 @@ footer.bot span{{color:var(--accent-azulejo)}}
     <div class="stat"><div class="k">Freguesias</div><div class="v">{len(FREGUESIAS)}</div></div>
   </div>
 
-  <div class="control-bar">
-    <button class="ctl-btn" id="btn-scan" onclick="startScan()">
-      <span id="btn-scan-icon">🔄</span>
-      <span id="btn-scan-label">התחל סריקה עכשיו</span>
-    </button>
-    <button class="ctl-btn-sec" onclick="openScheduleModal()">
-      ⏰ <span>תזמון לילי</span>
-    </button>
-    <div class="ctl-status">
-      <span class="ctl-dot" id="srv-dot"></span>
-      <span id="srv-label">בודק שרת...</span>
-      <span id="srv-schedule"></span>
-    </div>
-  </div>
-
   <div class="tabs">
     <button class="tab-btn active" data-tab="all">כל הנכסים <small>All · {meta['total']}</small></button>
     <button class="tab-btn" data-tab="composite">ציון מצרפי <small>Composite</small></button>
@@ -317,6 +316,7 @@ footer.bot span{{color:var(--accent-azulejo)}}
     <button class="tab-btn" data-tab="score_c">C · חוק <small>Legal</small></button>
     <button class="tab-btn" data-tab="score_d">D · מיקום <small>Location</small></button>
     <button class="tab-btn" data-tab="score_e">E · סיכון <small>Risk</small></button>
+    <button class="tab-btn" data-tab="invest_porto" style="border-color:rgba(228,184,100,.4);color:var(--accent-gold-b);">Invest Porto <small>{{len(invest_porto_props or [])}} נכסים · פורטל</small></button>
   </div>
 
   <div class="filters" id="filters-bar">
@@ -337,6 +337,22 @@ footer.bot span{{color:var(--accent-azulejo)}}
       <input type="number" id="area-min" placeholder="מינ׳" step="5">
       <span>–</span>
       <input type="number" id="area-max" placeholder="מקס׳" step="5">
+    </div>
+    <div class="range-filter" style="margin-inline-start:12px">
+      <label>שכונה</label>
+      <select id="freq-select" onchange="setFreq(this.value)"
+        style="background:var(--bg-2);border:1px solid var(--line);color:var(--text-0);padding:4px 8px;border-radius:6px;font-size:12px;direction:rtl">
+        <option value="">כל השכונות</option>
+        {freq_options}
+      </select>
+    </div>
+    <div class="range-filter" style="margin-inline-start:8px;gap:6px">
+      <input type="checkbox" id="new-only" onchange="setNewOnly(this.checked)" style="accent-color:var(--accent-gold)">
+      <label for="new-only" style="cursor:pointer;color:var(--accent-gold-b)">חדש בשוק (14 יום)</label>
+    </div>
+    <div class="range-filter" style="margin-inline-start:8px;gap:6px">
+      <input type="checkbox" id="strong-only" onchange="setStrongOnly(this.checked)" style="accent-color:var(--agent-a)">
+      <label for="strong-only" style="cursor:pointer;color:var(--agent-a)">קנייה חזקה ★</label>
     </div>
   </div>
 
@@ -374,6 +390,7 @@ const state = {{
   priceMin: null, priceMax: null, areaMin: null, areaMax: null,
   sortKey: null, sortDir: 'desc',
   page: 1, perPage: 30,
+  freqFilter: '', newOnly: false, strongOnly: false,
 }};
 
 function getBase() {{
@@ -389,6 +406,14 @@ function filter(rows) {{
     if (state.priceMax != null && r.price_eur > state.priceMax) return false;
     if (state.areaMin != null && r.area_m2 < state.areaMin) return false;
     if (state.areaMax != null && r.area_m2 > state.areaMax) return false;
+    if (state.freqFilter && r.freguesia !== state.freqFilter) return false;
+    if (state.newOnly) {{
+      const fs = r.first_seen ? r.first_seen.slice(0,10) : '';
+      if (!fs) return false;
+      const daysOld = (Date.now() - new Date(fs).getTime()) / 86400000;
+      if (daysOld > 14) return false;
+    }}
+    if (state.strongOnly && (r.composite == null || r.composite < 8.5)) return false;
     return true;
   }});
 }}
@@ -405,6 +430,9 @@ function sortRows(rows) {{
 }}
 
 function rowHtml(r, idx) {{
+  const daysOld = r.first_seen ? (Date.now() - new Date(r.first_seen.slice(0,10)).getTime()) / 86400000 : 999;
+  const newBadge = daysOld <= 14 ? '<span class="new-badge">NEW</span>' : '';
+  const sbClass = r.composite != null && r.composite >= 8.5 ? 'strong-buy-row' : '';
   const dims = r.score_a != null
     ? `<span class="dim a">${{r.score_a.toFixed(1)}}</span><span class="dim b">${{r.score_b.toFixed(1)}}</span><span class="dim c">${{r.score_c.toFixed(1)}}</span><span class="dim d">${{r.score_d.toFixed(1)}}</span><span class="dim e">${{r.score_e.toFixed(1)}}</span>`
     : '<span class="score-na">—</span>';
@@ -417,8 +445,8 @@ function rowHtml(r, idx) {{
     : '<span class="score-na">לא נותח</span>';
   const rowUrl = r.url_first || '#';
   return `
-    <tr onclick="window.open('${{rowUrl}}', '_blank')" title="פתח בלוח המקור">
-      <td class="rank">#${{idx}}</td>
+    <tr class="${{sbClass}}" onclick="window.open('${{rowUrl}}', '_blank')" title="פתח בלוח המקור">
+      <td class="rank"><button class="investigate-btn" onclick="event.stopPropagation();openInv(${{r.id}})">🔍</button> #${{idx}}${{newBadge}}</td>
       <td><strong>${{r.typology||'—'}}</strong></td>
       <td>${{r.freguesia||'<span class="score-na">—</span>'}}</td>
       <td class="addr"><span class="addr-sub">${{escape(r.address||'—')}}</span></td>
@@ -433,6 +461,10 @@ function rowHtml(r, idx) {{
 }}
 
 function escape(s) {{ return (s||'').replace(/[&<>"]/g, c => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}})[c]); }}
+
+function setFreq(v) {{ state.freqFilter = v; state.page = 1; render(); }}
+function setNewOnly(v) {{ state.newOnly = v; state.page = 1; render(); }}
+function setStrongOnly(v) {{ state.strongOnly = v; state.page = 1; render(); }}
 
 function render() {{
   const base = getBase();
@@ -525,126 +557,29 @@ document.querySelectorAll('[data-score]').forEach(p => {{
 
 render();
 
-/* ============================ */
-/*  CONTROL SERVER INTEGRATION  */
-/* ============================ */
-const SERVER = 'http://127.0.0.1:5055';
-
-async function pollStatus() {{
-  const dot = document.getElementById('srv-dot');
-  const lbl = document.getElementById('srv-label');
-  const sched = document.getElementById('srv-schedule');
-  const btnScan = document.getElementById('btn-scan');
-  const btnScanLabel = document.getElementById('btn-scan-label');
-  const btnScanIcon = document.getElementById('btn-scan-icon');
-  try {{
-    const r = await fetch(SERVER + '/api/status', {{cache: 'no-store'}});
-    if (!r.ok) throw new Error('bad');
-    const s = await r.json();
-    if (s.running) {{
-      dot.className = 'ctl-dot running';
-      lbl.textContent = 'סריקה פעילה...';
-      btnScan.disabled = true;
-      btnScanIcon.textContent = '⏳';
-      btnScanLabel.textContent = 'סריקה פעילה';
-    }} else {{
-      dot.className = 'ctl-dot online';
-      btnScan.disabled = false;
-      btnScanIcon.textContent = '🔄';
-      btnScanLabel.textContent = 'התחל סריקה עכשיו';
-      if (s.last_scan) {{
-        const ago = s.last_scan_ago_s || 0;
-        const agoTxt = ago < 60 ? `${{ago}}ש׳` : ago < 3600 ? `${{Math.floor(ago/60)}}ד׳` : `${{Math.floor(ago/3600)}}ש״`;
-        lbl.textContent = `שרת פעיל · סריקה אחרונה לפני ${{agoTxt}}${{s.last_count ? ` (${{s.last_count}} חדשים)` : ''}}`;
-      }} else {{
-        lbl.textContent = 'שרת פעיל · אין סריקה עדיין';
-      }}
-    }}
-    sched.textContent = s.schedule_hour != null ? `· ⏰ ${{String(s.schedule_hour).padStart(2,'0')}}:00` : '';
-  }} catch (e) {{
-    dot.className = 'ctl-dot offline';
-    lbl.innerHTML = 'שרת כבוי · <a href="#" onclick="showServerHelp();return false" style="color:var(--accent-gold-b);text-decoration:underline">כיצד להפעיל?</a>';
-    sched.textContent = '';
-    btnScan.disabled = true;
-  }}
+function openInv(id){{
+  document.getElementById('inv-overlay').style.display='block';
+  document.body.style.overflow='hidden';
+  document.getElementById('inv-content').innerHTML='<div id="inv-loading">🔍 Running PESSOA Full Investigation...<br><small style="color:#64748b">claude-opus-4-7 · ~60–90 seconds</small></div>';
+  fetch('/api/investigate/'+id)
+    .then(r=>r.text())
+    .then(html=>{{
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html,'text/html');
+      const body=doc.body.innerHTML;
+      document.getElementById('inv-content').innerHTML=body;
+    }})
+    .catch(e=>{{document.getElementById('inv-content').innerHTML='<p style="color:#f87171;padding:20px">Error: '+e+'</p>'}});
 }}
-
-async function startScan() {{
-  try {{
-    const r = await fetch(SERVER + '/api/scan/start', {{method: 'POST', headers: {{'Content-Type':'application/json'}}, body: '{{"pages":3}}'}});
-    const d = await r.json();
-    if (r.ok) {{
-      alert('✅ סריקה החלה — לחץ "רענן" בעוד 5 דקות לראות תוצאות.');
-      pollStatus();
-    }} else {{
-      alert('שגיאה: ' + (d.error || 'unknown'));
-    }}
-  }} catch (e) {{
-    alert('לא הצלחתי להתחבר לשרת. ודא שהוא רץ (הרץ server/start_server.bat)');
-  }}
+function closeInv(){{
+  document.getElementById('inv-overlay').style.display='none';
+  document.body.style.overflow='';
 }}
-
-function showServerHelp() {{
-  alert('כדי להפעיל את הסריקה מהדשבורד:\\n\\n' +
-        '1. פתח את C:\\\\Users\\\\user\\\\porto-pessoa\\\\server\\\\\\n' +
-        '2. הרץ start_server.bat (קליק כפול)\\n' +
-        '3. רענן את הדף');
-}}
-
-function openScheduleModal() {{
-  document.getElementById('schedule-modal').classList.add('open');
-}}
-function closeScheduleModal() {{
-  document.getElementById('schedule-modal').classList.remove('open');
-}}
-
-async function saveSchedule() {{
-  const hour = parseInt(document.getElementById('sched-hour').value || '3');
-  try {{
-    const r = await fetch(SERVER + '/api/schedule', {{
-      method: 'POST', headers: {{'Content-Type': 'application/json'}},
-      body: JSON.stringify({{hour}}),
-    }});
-    const d = await r.json();
-    if (r.ok) {{
-      closeScheduleModal();
-      alert(`✅ תזמון יומי נקבע ל-${{String(hour).padStart(2,'0')}}:00`);
-      pollStatus();
-    }} else {{
-      alert('שגיאה: ' + (d.error || 'unknown'));
-    }}
-  }} catch (e) {{
-    alert('שרת לא זמין');
-  }}
-}}
-
-async function removeSchedule() {{
-  if (!confirm('להסיר תזמון יומי?')) return;
-  try {{
-    const r = await fetch(SERVER + '/api/schedule', {{method: 'DELETE'}});
-    closeScheduleModal();
-    pollStatus();
-  }} catch (e) {{ alert('שרת לא זמין'); }}
-}}
-
-pollStatus();
-setInterval(pollStatus, 5000);
 </script>
-<!-- Schedule Modal -->
-<div class="modal-bg" id="schedule-modal" onclick="if(event.target===this)closeScheduleModal()">
-  <div class="modal">
-    <h3>⏰ תזמון סריקה לילית</h3>
-    <p>באיזה שעה לילית להריץ את הסריקה האוטומטית? (0-23 שעון מקומי)</p>
-    <div class="hour-input">
-      <label>שעה:</label>
-      <input type="number" id="sched-hour" min="0" max="23" value="3">
-      <span>:00</span>
-    </div>
-    <div class="modal-actions">
-      <button class="ctl-btn-sec" onclick="removeSchedule()">הסרה</button>
-      <button class="ctl-btn-sec" onclick="closeScheduleModal()">ביטול</button>
-      <button class="ctl-btn" onclick="saveSchedule()">שמור</button>
-    </div>
+<div id="inv-overlay" onclick="if(event.target===this)closeInv()">
+  <div id="inv-modal">
+    <button id="inv-close" onclick="closeInv()">✕ Close</button>
+    <div id="inv-content"></div>
   </div>
 </div>
 </body>
@@ -749,7 +684,8 @@ def build():
         "score_d":   _top_by_score("score_d"),
         "score_e":   _top_by_score("score_e"),
     }
-    (DASH_OUT / "index.html").write_text(_render_index(all_props, by_score, meta), encoding="utf-8")
+    invest_porto_props = _invest_porto_properties()
+    (DASH_OUT / "index.html").write_text(_render_index(all_props, by_score, meta, invest_porto_props), encoding="utf-8")
 
     # Per-property drill-down — only scored ones (unscored go to external URL in JS)
     with _conn() as db:
@@ -757,6 +693,7 @@ def build():
     for pid in scored_ids:
         (DASH_OUT / f"property_{pid}.html").write_text(_render_property_page(pid), encoding="utf-8")
 
+    (DASH_OUT / "settings.html").write_text(_render_settings(), encoding="utf-8")
     print(f"[dashboard] {meta['total']} properties · {len(scored_ids)} scored drill-downs")
 
 
